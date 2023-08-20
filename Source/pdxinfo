@@ -1,0 +1,7 @@
+name=One-Armed Space Bandit
+author=Edenwaith
+description=A basic game template.
+bundleID=com.edenwaith.onearmedspacebandit
+version=1.0
+buildNumber=100
+imagePath=SystemAssets
