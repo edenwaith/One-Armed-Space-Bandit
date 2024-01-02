@@ -2,25 +2,34 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
-import '../toyboxes/toyboxes.lua'
-import "TitleScreen"
-import "RoomB"
+-- import '../toyboxes/toyboxes.lua'
+-- import 'roomy-playdate'
+-- import "TitleScreen"
+-- import "InstructionsScreen"
+-- import "RoomB"
 -- import 'GamePlay'
 
--- Super awesome global variables
-gfx = playdate.graphics
-sceneManager = Manager()
+import 'libraries/noble/Noble'
 
--- gfx.setColor(gfx.kColorWhite)
--- sceneManager.push(GamePlay())
+import 'utilities/Utilities'
 
-sceneManager:hook()
-sceneManager:enter(TitleScreen())
+import 'scenes/ExampleScene'
+import 'scenes/ExampleScene2'
+import 'scenes/TitleScene'
+import 'scenes/InstructionsScene'
+import 'scenes/GameScene'
 
-function playdate.update()
-    -- gfx.setColor(gfx.kColorBlack)
-    -- gfx.fillRect(20, 20, 200, 120)
-    gfx.sprite.update()
-    playdate.drawFPS(0,0)
-    sceneManager:emit('update')
-end
+
+Noble.Settings.setup({
+    Difficulty = "Medium"
+})
+
+Noble.GameData.setup({
+    Score = 0
+})
+
+Noble.showFPS = true
+
+-- Load in the TitleScene
+Noble.new(TitleScene, 1.5, Noble.TransitionType.CROSS_DISSOLVE)
+

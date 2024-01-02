@@ -51,6 +51,8 @@ function RoomB:leave(next, ...)
   -- destroy entities and cleanup resources
   print("Leaving RoomB")
   gfx.clear(gfx.kColorWhite)
+  gfx.sprite.removeAll()
+  -- clear()
 end
 
 function RoomB:draw()
