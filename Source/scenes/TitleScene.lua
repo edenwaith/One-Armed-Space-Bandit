@@ -25,8 +25,9 @@ function scene:init()
 --	menu:addItem(Noble.TransitionType.DIP_TO_WHITE, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 	-- This one seems like an optional menu item, depending if a game was being played, or just maintain 
 	-- the current game state and return to the in-progress game
-	menu:addItem("Continue Game", function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
+	menu:addItem("Continue Game", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
 	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
+	menu:addItem("Sounds", transitionToSoundsScene)
 	-- menu:addItem("High Scores", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 
 -- 	menu:addItem(Noble.TransitionType.DIP_METRO_NEXUS, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
@@ -72,6 +73,12 @@ function scene:init()
 		end
 	}
 
+end
+
+
+function transitionToSoundsScene()
+	print("in transitionToSoundsScene function")
+	Noble.transition(SoundsScene, 1, Noble.TransitionType.DIP_TO_BLACK)
 end
 
 function scene:enter()

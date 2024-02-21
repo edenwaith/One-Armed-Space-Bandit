@@ -1,0 +1,173 @@
+// logic.115 -- Slot machine logic for win/loss conditions
+if (v26 == 2 &&
+    v20 == 0) {
+  v245 = 18;
+}
+else {
+  v245 = 16;
+}
+v246 = 13;
+if (v129 == 1) {
+  set(f123);
+  set(f233);
+  v64 = 0;
+}
+else {
+  if (v129 == 2) {
+    v64 = 0;
+  }
+  else {
+    if (v129 == 7) {
+      if (v123 == 1) {
+        v64 = 20;
+      }
+      else {
+        if (v123 == 2) {
+          v64 = 40;
+        }
+        else {
+          v64 = 60;
+        }
+      }
+    }
+    else {
+      if (v129 == 6) {
+        if (v123 == 1) {
+          v64 = 10;
+        }
+        else {
+          if (v123 == 2) {
+            v64 = 20;
+          }
+          else {
+            v64 = 30;
+          }
+        }
+      }
+      else {
+        if (v129 == 5) {
+          if (v123 == 1) {
+            v64 = 5;
+          }
+          else {
+            if (v123 == 2) {
+              v64 = 10;
+            }
+            else {
+              v64 = 15;
+            }
+          }
+        }
+        else {
+          if (v129 == 4) {
+            if (v123 == 1) {
+              v64 = 3;
+            }
+            else {
+              if (v123 == 2) {
+                v64 = 6;
+              }
+              else {
+                v64 = 9;
+              }
+            }
+          }
+          else {
+            if (v129 == 3) {
+              if (v123 == 1) {
+                v64 = 1;
+              }
+              else {
+                if (v123 == 2) {
+                  v64 = 2;
+                }
+                else {
+                  v64 = 3;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+if (v26 == 2 &&
+    v20 == 0) {
+  display(18,13,"               ");
+}
+else {
+  display(16,13,"               ");
+}
+if (v129 != 2 &&
+    v129 != 1) {
+  if (v26 == 2 &&
+      v20 == 0) {
+    display(18,13," You Win  $%v64 ");
+  }
+  else {
+    display(16,13," You Win  $%v64 ");
+  }
+}
+else {
+  random(6,12,v247);
+  display.v(v245,v246,v247);
+}
+v123 = 0;
+v126 = 250;
+v126 -= v124;
+if (v124 <= 0) {
+  drop("buckazoid(s)");
+}
+if (v126 < v64) {
+  v124 = 250;
+  if (v26 == 2 &&
+      v20 == 0) {
+    display(20,13," You Have $%v124");
+  }
+  else {
+    display(18,13," You Have $%v124");
+  }
+  print("Sorry, there seems to be a circuit"
+        "failure.  To be reimbursed send claim to"
+        "Gippazoid Novelties, 2001 Odessa Blastway"
+        " Gurnville, Faydor    Exl Galaxy.\n"
+        "(Please allow two decades for delivery)");
+  reset(f95);
+  enable.item(c22);
+  new.room(70);
+}
+v124 += v64;
+if (v124 > 0 &&
+    !has("buckazoid(s)")) {
+  get("buckazoid(s)");
+}
+if (v26 == 2 &&
+    v20 == 0) {
+  display(20,13," You Have $%v124");
+}
+else {
+  display(18,13," You Have $%v124");
+}
+reset(f134);
+v129 = 8;
+if (!isset(f123)) {
+  accept.input();
+}
+reset(f95);
+return();
+return();
+
+// Messages
+#message 1 "Sorry, there seems to be a circuit failure.  To be reimbursed send claim to Gippazoid Novelties, 2001 Odessa Blastway  Gurnville, Faydor    Exl Galaxy.\n (Please allow two decades for delivery)"
+#message 2 " You Win  $%v64 "
+#message 4 "               "
+#message 5 " You Have $%v124"
+#message 6 "   You Lose    "
+#message 7 "  Tough Luck   "
+#message 8 " It's Hopeless "
+#message 9 "   Eat Sand    "
+#message 10 " Suck Methane  "
+#message 11 "   So Sorry    "
+#message 12 " Not A Chance  "
+

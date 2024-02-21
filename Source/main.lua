@@ -18,6 +18,7 @@ import 'scenes/ExampleScene2'
 import 'scenes/TitleScene'
 import 'scenes/InstructionsScene'
 import 'scenes/GameScene'
+import 'scenes/SoundsScene'
 
 
 Noble.Settings.setup({

@@ -1,0 +1,112 @@
+// logic.114 -- More slot machine logic
+if (v134 > 0) {
+  v134--;
+  if (v134 == 0) {
+    v129 = 1;
+  }
+  if (v134 == 1) {
+    v129 = 5;
+  }
+  if (v134 == 2) {
+    v129 = 7;
+  }
+  if (v134 > 2) {
+    v134 = 3;
+    v129 = 6;
+  }
+  v125 = v134;
+  v127 = v134;
+  v128 = v134;
+}
+else {
+  random(1,100,v64);
+  -- v64 is the random chance of winnings
+  -- Under 3 is death
+  if (v64 < 3) {
+    v125 = 0;
+    v127 = 0;
+    v128 = 0;
+    v129 = 1;
+  }
+  else {
+    -- If equal to 4, diamonds (what about if v64 is 3?)
+    if (v64 == 4) {
+      v125 = 2;
+      v127 = 2;
+      v128 = 2;
+      v129 = 7;
+    }
+    else {
+      -- 3 or 5 wins eyes
+      if (v64 < 6) {
+        v125 = 3;
+        v127 = 3;
+        v128 = 3;
+        v129 = 6;
+      }
+      else {
+        -- 6 to 9 wins three cherries
+        if (v64 < 10) {
+          v125 = 1; -- first slot value
+          v127 = 1; -- second slot value
+          v128 = 1; -- third slot value
+          v129 = 5;
+        }
+        else {
+          -- 10 to 16 wins two cherries
+          if (v64 < 17) {
+            v125 = 1;
+            v127 = 1;
+Label1:
+            random(0,3,v128);
+            -- If v128 matches v125 or v127, try again so it doesn't result in 3 cherries
+            if ((v128 == v127 ||
+                v128 == v125)) {
+              goto(Label1);
+            }
+            v129 = 4;
+          }
+          else {
+            -- 17 to 32 wins one cherry
+            if (v64 < 33) {
+              v125 = 1;
+Label2:
+              random(0,3,v127);
+              if (v127 == 1) {
+                goto(Label2);
+              }
+              random(0,3,v128);
+              v129 = 3;
+            }
+            else {
+Label3:
+              random(0,3,v125);
+              if (v125 == 1) {
+                goto(Label3);
+              }
+              random(0,3,v127);
+Label4:
+              random(0,3,v128);
+              if (v127 == v125 &&
+                  v128 == v127) {
+                if (v128 == v127) {
+                  goto(Label4);
+                }
+              }
+              v129 = 2;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+if (v129 != 8) {
+  set(f126);
+  v134 = 0;
+  return();
+}
+return();
+
+// Messages
+
