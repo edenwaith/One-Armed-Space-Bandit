@@ -21,11 +21,13 @@ function scene:init()
 
 
 -- 	menu:addItem(Noble.TransitionType.DIP_TO_BLACK, function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
+
+	-- TODO: Need to do some more checks, ensure that the game status has been updated, reset money, etc.
 	menu:addItem("New Game", function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 --	menu:addItem(Noble.TransitionType.DIP_TO_WHITE, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 	-- This one seems like an optional menu item, depending if a game was being played, or just maintain 
 	-- the current game state and return to the in-progress game
-	menu:addItem("Continue Game", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
+	-- menu:addItem("Continue Game", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
 	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 	menu:addItem("Sounds", transitionToSoundsScene)
 	-- menu:addItem("High Scores", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_BLACK) end)
@@ -48,6 +50,7 @@ function scene:init()
 		nil,
 		"Difficulty: " .. Noble.Settings.get("Difficulty")
 	)
+	menu:addItem("Credits", function() Noble.transition(CreditsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end) -- Need to update to new screen
 
 	local crankTick = 0
 
@@ -93,7 +96,7 @@ function scene:start()
 	scene.super.start(self)
 
 	menu:activate()
-	Noble.Input.setCrankIndicatorStatus(true)
+	Noble.Input.setCrankIndicatorStatus(false)
 
 end
 
@@ -111,10 +114,15 @@ function scene:update()
 	Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
 	menu:draw(30, sequence:get()-15 or 100-15)
 
+	local version_num = "v" .. playdate.metadata.version 
+	Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+
 	Graphics.setColor(Graphics.kColorWhite)
 	Graphics.fillRoundRect(260, -20, 130, 65, 15)
 	-- logo:setInverted(true)
 	-- logo:draw(275, 8)
+	
+	
 
 end
 

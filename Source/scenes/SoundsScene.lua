@@ -227,7 +227,7 @@ function scene:update()
 	
 	-- Noble.Text.setColor(Graphics.kColorBlack) -- causes a crash
 	gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
-	Noble.Text.draw("Press Ⓑ to return to the main menu", 350, 220, Noble.Text.ALIGN_RIGHT) -- Ⓐ or Ⓑ
+	Noble.Text.draw("Press Ⓑ to return to the main menu", 385, 220, Noble.Text.ALIGN_RIGHT) -- Ⓐ or Ⓑ
 	
 	-- playdate.graphics.drawText("Your only hope to get off this crusty rock of a \nplanet is to earn 250 Buckazoids at the \n Slots-o-Death so you can buy a ship.", 10, 110)
 								
@@ -420,12 +420,18 @@ function playSound28()
 	sound28:play()
 end
 
+-- Death sound
+-- This is a sequence
 function playSound66()
 	stopAllSounds()
 	
 	local track1 = sound66:getTrackAtIndex(1)
 	local track2 = sound66:getTrackAtIndex(2)
 	local track3 = sound66:getTrackAtIndex(3) 
+	
+	synthPlayer:setVolume(0.5)
+	local synthVolume = synthPlayer:getVolume()
+	print("synthVolume is " .. synthVolume)
 	
 	track1:setInstrument(synthPlayer:copy())
 	track2:setInstrument(synthPlayer:copy())

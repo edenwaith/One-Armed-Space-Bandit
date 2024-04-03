@@ -146,7 +146,7 @@ function scene:init()
 		end,
 		BButtonDown = function()
 			-- Go back to the previous screen
-			Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_RIGHT)
+			Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
 			-- print("Go back to the title screen")
 		end
 		
