@@ -1,15 +1,21 @@
 // logic.114 -- More slot machine logic
+-- Perhaps v134 is used when cheating, so options 1-4 (1: skulls, 2: cherries, 3: diamonds, 4: eyes)
 if (v134 > 0) {
+  -- v129 determines the "win" state
   v134--;
+  -- Death
   if (v134 == 0) {
     v129 = 1;
   }
+  -- 3 Cherries
   if (v134 == 1) {
     v129 = 5;
   }
+  -- 3 Diamonds
   if (v134 == 2) {
     v129 = 7;
   }
+  -- Eyes
   if (v134 > 2) {
     v134 = 3;
     v129 = 6;
@@ -81,19 +87,25 @@ Label2:
             else {
 Label3:
               random(0,3,v125);
+              -- In a losing state, the first slot cannot be a cherry (1)
               if (v125 == 1) {
                 goto(Label3);
               }
+              -- Select a random value for the second slot
               random(0,3,v127);
 Label4:
+			 -- Select a random value for the third slot
               random(0,3,v128);
+              -- Make sure that all three items do not match
+              -- If they do, then select a new random image for the 
+              -- third slot 
               if (v127 == v125 &&
                   v128 == v127) {
                 if (v128 == v127) {
                   goto(Label4);
                 }
               }
-              v129 = 2;
+              v129 = 2; -- Lost
             }
           }
         }

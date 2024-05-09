@@ -1,3 +1,5 @@
+import "CoreLibs/graphics"
+
 class("TitleScreen").extends(Room)
 
 function TitleScreen:enter(previous, ...)
@@ -42,6 +44,8 @@ function TitleScreen:update(dt)
 		print("Just pressed the down button")
 	end
 	
+	
+	-- playdate.graphics.drawTextAligned("Emoji _Glyphs!_ 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️", 200, 40, kTextAlignment.center)
 end
 
 function TitleScreen:leave(next, ...)

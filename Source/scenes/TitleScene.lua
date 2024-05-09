@@ -2,6 +2,8 @@ TitleScene = {}
 class("TitleScene").extends(NobleScene)
 local scene = TitleScene
 
+local gfx <const> = playdate.graphics
+
 scene.baseColor = Graphics.kColorWhite
 
 -- local background
@@ -23,11 +25,19 @@ function scene:init()
 -- 	menu:addItem(Noble.TransitionType.DIP_TO_BLACK, function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 
 	-- TODO: Need to do some more checks, ensure that the game status has been updated, reset money, etc.
-	menu:addItem("New Game", function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
+	-- menu:addItem("New Game", function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
+	menu:addItem("New Game", transitionNewGame)
 --	menu:addItem(Noble.TransitionType.DIP_TO_WHITE, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 	-- This one seems like an optional menu item, depending if a game was being played, or just maintain 
 	-- the current game state and return to the in-progress game
 	-- menu:addItem("Continue Game", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
+	
+	if Noble.GameData.Status == GameStatus.Playing then
+		-- TODO: Need to create some new method or ensure that certain status and variables are set properly
+		menu:addItem("Continue Game",  function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
+	end
+	
+	
 	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 	menu:addItem("Sounds", transitionToSoundsScene)
 	-- menu:addItem("High Scores", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_BLACK) end)
@@ -78,6 +88,10 @@ function scene:init()
 
 end
 
+function transitionNewGame()
+	Noble.GameData.Status = GameStatus.New 
+	Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE)
+end
 
 function transitionToSoundsScene()
 	print("in transitionToSoundsScene function")
@@ -110,20 +124,24 @@ function scene:update()
 	scene.super.update(self)
 
 	Graphics.setColor(Graphics.kColorBlack)
-	Graphics.setDitherPattern(0.2, Graphics.image.kDitherTypeScreen)
-	Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
-	menu:draw(30, sequence:get()-15 or 100-15)
+	-- Graphics.setDitherPattern(0.2, Graphics.image.kDitherTypeScreen)
+	-- Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
+	Graphics.fillRect(240, 0, 160, 240)
+	menu:draw(250, 20)
+	-- menu:draw(30, sequence:get()-15 or 100-15)
 
+	-- Graphics.setColor(Graphics.kColorWhite)
+	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
 	local version_num = "v" .. playdate.metadata.version 
 	Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
 
-	Graphics.setColor(Graphics.kColorWhite)
-	Graphics.fillRoundRect(260, -20, 130, 65, 15)
+	-- Graphics.setColor(Graphics.kColorWhite)
+	-- Graphics.fillRoundRect(260, -20, 130, 65, 15)
 	-- logo:setInverted(true)
 	-- logo:draw(275, 8)
 	
-	
-
+	-- https://devforum.play.date/t/using-glyphs-illustrated-in-designing-for-playdate/3678
+	-- playdate.graphics.drawTextAligned("Emoji _Glyphs!_ 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️", 200, 50, kTextAlignment.center)
 end
 
 function scene:exit()

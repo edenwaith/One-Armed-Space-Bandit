@@ -27,8 +27,9 @@ GameStatus = {
     Death = 1,
     Broke = 2,
     Won = 3,
-    Playing = 4,
-    NotPlaying = 5,
+    New = 4,
+    Playing = 5,
+    NotPlaying = 6
 }
 
 Noble.Settings.setup({

@@ -159,6 +159,19 @@ function scene:enter()
 
 	sequence = Sequence.new():from(0):to(100, 1.5, Ease.outBounce)
 	sequence:start();
+	
+	
+	local sierraFont = gfx.font.new('fonts/Sierra-AGI-Basic-Latin-and-Supplement')
+	-- gfx.setFont(sierraFont)
+	
+	local roobert_font <const> =  gfx.font.new('font-rains') -- Roobert-20-Medium
+	gfx.setFont(roobert_font)
+	
+	-- local system_font <const> = gfx.getSystemFont("normal")
+	-- system_font <const> = 
+	-- gfx.setFont(system_font, playdate.graphics.font.kVariantItalic);
+	
+
 
 end
 
@@ -186,6 +199,11 @@ function scene:update()
 -- 	Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
 -- 	-- menu:draw(30, sequence:get()-15 or 100-15)
 -- 
+
+	-- local myRoobertFontInstance <const> = playdate.graphics.font.new("Roobert-24-Medium")
+	-- playdate.graphics.setFont(myRoobertFontInstance)
+	-- myRoobertFontInstance:drawText("Some experimental text", 40, 60)
+
 	Graphics.setColor(Graphics.kColorBlack)
 	Graphics.fillRect(0, 0, 400, 25)
 	
@@ -207,6 +225,20 @@ function scene:update()
 	gfx.drawText("_The story so far..._", 10, 40)
 	gfx.drawText(instructionsText, 10, 70)
 	
+	-- Ⓐ
+	-- Ⓑ
+	-- 🟨
+	-- ⊙
+	-- 🔒
+	-- 🎣
+	-- ✛
+	-- ⬆
+	-- ➡
+	-- ⬇
+	-- ⬅
+	
+	-- Noble.Text.draw("⬅️ ⬅", 10, 180, Noble.Text.ALIGN_LEFT);
+	-- Noble.Text.draw("Some icons: 🟨 ⊙ 🔒 🎣 ✛ ⬆️ ➡️ ⬇️ ⬅️", 10, 200, Noble.Text.ALIGN_LEFT)
 	Noble.Text.draw("Press Ⓐ to continue", 385, 220, Noble.Text.ALIGN_RIGHT) -- Ⓑ
 	
 	-- playdate.graphics.drawText("Your only hope to get off this crusty rock of a \nplanet is to earn 250 Buckazoids at the \n Slots-o-Death so you can buy a ship.", 10, 110)

@@ -15,6 +15,8 @@ local money = 30
 local currentBet = 1
 local crankTick = 0
 local is_crank_starting = false
+
+local is_currently_spinning = false 
 -- local difficulty = gameDifficulty() -- 1 is hard, 2 is medium, 3 is easy
 -- local handicap = (difficulty - 1) * 5
 local youLostMessages = {"You Lose", "Tough Luck", "It's Hopeless", "Eat Sand", "Suck Methane", "So Sorry", "Not A Chance"}
@@ -26,6 +28,10 @@ local firstSlotRotations  = 0
 local secondSlotRotations = 0
 local thirdSlotRotations  = 0
 local rotations = 0
+
+local first_slot_image = 1
+local second_slot_image = 1
+local third_slot_image = 1
 
 -- Image variables
 local skull_image = gfx.image.new("images/skull-dithered")
@@ -61,15 +67,6 @@ RollStatus = {
     NotPlaying = 8,
 }
 
-local rollStatus
-
--- Colors = {
---    BLUE = 1,
---    GREEN = 2,
---    RED = 3,
---    VIOLET = 4,
---    YELLOW = 5,
--- }
 
 function scene:init()
 	scene.super.init(self)
@@ -142,20 +139,44 @@ function scene:init()
 		-- 	menu:click()
 		-- end,
 		upButtonUp = function()
-			if currentBet < 3 then
-				currentBet = currentBet + 1
+			-- TODO: Need to check that the game isn't currently spinning
+			if is_currently_spinning == false then
+				if currentBet < 3 then
+					currentBet = currentBet + 1
+				end
 			end
 		end,
 		downButtonUp = function()
-			if currentBet > 1 then
-				currentBet = currentBet - 1
+			if is_currently_spinning == false then
+				if currentBet > 1 then
+					currentBet = currentBet - 1
+				end
 			end
 		end,
+		leftButtonUp = function()
+			print("Left button up")
+			-- Simulate win state
+			Noble.GameData.Status = GameStatus.Won
+			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+		end, 
+		rightButtonHold = function()
+			print("You're broke!")
+			Noble.GameData.Status = GameStatus.Broke 
+			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+		end,
+		rightButtonUp = function()
+			print("Right button up")
+			-- Simulate death state 
+			Noble.GameData.Status = GameStatus.Death
+			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+		end,
+	-- Add left and right D-pad buttons to get to different end game states
 		AButtonDown = spin,
 		BButtonDown = function()
+			if is_currently_spinning == false then
 			-- Go back to the previous screen
-			Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
-			-- print("Go back to the title screen")
+				Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
+			end
 		end
 		
 	}
@@ -166,9 +187,28 @@ function scene:enter()
 	scene.super.enter(self)
 	print("GameScene enter")
 
+	
+
 	sequence = Sequence.new():from(0):to(100, 1.5, Ease.outBounce)
 	sequence:start();
-
+	
+	-- Might only need to set this if the player isn't already playing
+	-- Or have some other option to continue an existing game
+	if Noble.GameData.Status == GameStatus.New then
+		money = 30
+		roll_status = RollStatus.NotPlaying
+	end 
+	
+	Noble.GameData.Status = GameStatus.Playing
+	
+	-- Set the initial images when starting
+	first_slot_image = math.random(1, 4)
+	first_slot_sprite:setImage(images_array[first_slot_image]) 
+	second_slot_image = math.random(1, 4)
+	second_slot_sprite:setImage(images_array[second_slot_image]) 
+	third_slot_image = math.random(1, 4)
+	third_slot_sprite:setImage(images_array[third_slot_image]) 
+	
 end
 
 function scene:start()
@@ -191,6 +231,10 @@ function scene:start()
 	third_slot_sprite:moveTo(308, 120)
 	third_slot_sprite:add()
 
+	-- This font looks a little too small: is it possible to enlarge?	
+	-- local sierraFont = gfx.font.new('fonts/Sierra-AGI-Basic-Latin-and-Supplement')
+	-- gfx.setFont(sierraFont)
+
 	-- menu:activate()
 	-- if playdate.isCrankDocked() == true then
 	-- 	Noble.Input.setCrankIndicatorStatus(true)
@@ -201,20 +245,12 @@ end
 function scene:drawBackground()
 	scene.super.drawBackground(self)
 
-	-- background:draw(0, 0)
-	
 	  -- Set the background image
 	local backgroundImage = gfx.image.new( "images/Slots-Background" ) -- RoomAbkg
 	-- Crash: scenes/GameScene.lua:133: attempt to index a nil value (local 'backgroundImage')
 	assert( backgroundImage )
 	
 	backgroundImage:draw( 0, 0 )
-	
-	-- gfx.sprite.setBackgroundDrawingCallback(
-	-- 	function( x, y, width, height )
-  	--   		backgroundImage:draw( 0, 0 )
-	-- 	end
-	-- )
 end
 
 
@@ -245,11 +281,13 @@ function scene:update()
 -- 
 -- 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
 	Graphics.setImageDrawMode(gfx.kDrawModeFillWhite) -- this causes the background image to disappear.
-	local winnings = "You have $" .. money -- Concatenate the string with the money value
+	local winnings = "*You have $" .. money .. "*" -- Concatenate the string with the money value
 	Noble.Text.draw(winnings, 15, 4, Noble.Text.ALIGN_LEFT)
  	
-	local bet = "You bet $" .. currentBet
+	local bet = "*You bet $" .. currentBet .. "*"
 	Noble.Text.draw(bet, 300, 4, Noble.Text.ALIGN_LEFT)
+	
+	
 	
 	Noble.Text.draw(spinMessage, 200, 219, Noble.Text.ALIGN_CENTER)
 	
@@ -268,20 +306,54 @@ function updateSquares()
 
 	local modVal = rotations % 2
 
--- if rotations < thirdSlotRotations then
--- 	
--- 	-- Need to update the UI here
--- 	
--- 	if rotations < firstSlotRotations then
+	-- This works to ensure the white squares are showing properly, but 
+	-- this code has a lot of duplications, probably can be done better.
+	-- Lua doesn't have a traditional ternary operator:
+	-- http://lua-users.org/wiki/TernaryOperator
+	
+	-- First slot
+ 	if rotations < firstSlotRotations then
 		
-	if modVal == 1 then
+		if modVal == 1 then
+			Graphics.setColor(Graphics.kColorWhite)
+		else
+			Graphics.setColor(Graphics.kColorBlack)
+		end
+	
+	else 
 		Graphics.setColor(Graphics.kColorWhite)
-	else
-		Graphics.setColor(Graphics.kColorBlack)
 	end
 	
 	Graphics.fillRect(86, 56, 8, 8)
+	
+	-- Second slot
+	 if rotations < secondSlotRotations then
+		
+		if modVal == 1 then
+			Graphics.setColor(Graphics.kColorWhite)
+		else
+			Graphics.setColor(Graphics.kColorBlack)
+		end
+	
+	else 
+		Graphics.setColor(Graphics.kColorWhite)
+	end	
+	
+	-- Third slot
 	Graphics.fillRect(196, 56, 8, 8)
+	
+	if rotations < thirdSlotRotations then
+		
+		if modVal == 1 then
+			Graphics.setColor(Graphics.kColorWhite)
+		else
+			Graphics.setColor(Graphics.kColorBlack)
+		end
+	
+	else 
+		Graphics.setColor(Graphics.kColorWhite)
+	end	
+	
 	Graphics.fillRect(305, 56, 8, 8)
 
 end
@@ -309,6 +381,12 @@ function spin()
 	
 	-- TODO: Need to check if things are currently spinning, and if so
 	-- do not do anything here so it doesn't try to spin again
+		
+	if is_currently_spinning == true then 
+		return 
+	else 
+		is_currently_spinning = true
+	end 
 	
 	spinMessage = "" -- Reset this message on a new spin
 	
@@ -317,6 +395,24 @@ function spin()
 	else
 	
 		roll = math.random(1, 100)
+		local handicap = handicap()
+		
+		if (roll < 3) then  -- Death
+			roll_status = RollStatus.Death
+		elseif roll < (5 + handicap) then -- 3 Diamonds
+			roll_status = RollStatus.Diamonds
+		elseif roll < (7 + handicap) then -- 3 Eyes
+			roll_status = RollStatus.Eyes
+		elseif roll < (11 + handicap) then -- 3 Cherries
+			roll_status = RollStatus.ThreeCherries
+		elseif roll < (18 + handicap) then -- 2 Cherries
+			roll_status = RollStatus.TwoCherries
+		elseif roll < (34 + handicap) then -- 1 Cherry
+			roll_status = RollStatus.OneCherry
+		else -- Lost
+			roll_status = RollStatus.Lost 
+		end
+		
 		-- turns = turns + 1
 		money = money - currentBet -- Money for the turn 
 		
@@ -328,14 +424,21 @@ function spin()
 		secondSlotRotations = math.random(13, 19) -- initially 26 to 38
 		thirdSlotRotations = math.random(21, 26) -- initially 42 to 53
 		
+		print("Slot rotations are 1: " .. firstSlotRotations .. " 2: " .. secondSlotRotations .. " 3: " .. thirdSlotRotations)
+		
 		playBlipSound()
 	end
 end
 
-function random_image_number()
+-- Select a random number from 1 to 4 to determine a random image to display
+-- If exception_num is defined, that particular corresponding image will be
+-- excluded from the possible images.  The default value is 2 (cherry)
+function random_image_number(exception_num)
+	exception_num = exception_num or 2
+	
 	local random_num = math.random(1, 4)
 	
-	while (random_num == 2)
+	while (random_num == exception_num)
 	do
 		random_num = math.random(1, 4)
 	end
@@ -346,11 +449,16 @@ end
 
 function continueSpinning()
 	
-	print("Slot rotations are 1: " .. firstSlotRotations .. " 2: " .. secondSlotRotations .. " 3: " .. thirdSlotRotations)
+	-- print("Slot rotations are 1: " .. firstSlotRotations .. " 2: " .. secondSlotRotations .. " 3: " .. thirdSlotRotations)
 	
 	rotations = rotations + 1
 	local modVal = rotations % 4 + 1 -- Need to ensure it is never zero
+	local first_image = (rotations + first_slot_image) % 4 + 1
+	local second_image = (rotations + second_slot_image) % 4 + 1
+	local third_image = (rotations + third_slot_image) % 4 + 1
 	local handicap = handicap()
+	
+	-- print("first_image: " .. first_image .. " second_image: " .. second_image .. " third_image: " .. third_image)
 	
 	if rotations <= thirdSlotRotations then
 		
@@ -358,67 +466,116 @@ function continueSpinning()
 		
 		if rotations < firstSlotRotations then
 			
-			if modVal < 2 then
-				Graphics.setColor(Graphics.kColorWhite)
-			else
-				Graphics.setColor(Graphics.kColorBlack)
-			end
+			first_slot_sprite:setImage(images_array[first_image]) 
+			first_slot_image = first_image
 			
-			Graphics.fillRect(86, 56, 8, 8)
-			Graphics.fillRect(196, 56, 8, 8)
-			Graphics.fillRect(305, 56, 8, 8)
-			
-			first_slot_sprite:setImage(images_array[modVal]) 
 		elseif rotations == firstSlotRotations then
-			if (roll < 3) then -- Death
+			if (roll_status == RollStatus.Death) then -- Death
+				first_slot_image = 1
 				first_slot_sprite:setImage(images_array[1])
-			elseif roll < (5 + handicap) then
+			elseif roll_status == RollStatus.Diamonds then
+				first_slot_image = 4
 				first_slot_sprite:setImage(images_array[4]) 
-			elseif roll < (7 + handicap) then -- 3 Eyes
+			elseif roll_status == RollStatus.Eyes then -- 3 Eyes
+				first_slot_image = 3
 				first_slot_sprite:setImage(images_array[3])
-			elseif roll < (34 + handicap) then
+			elseif roll_status == RollStatus.ThreeCherries then
+				first_slot_image = 2
+				first_slot_sprite:setImage(images_array[2]) 
+			elseif roll_status == RollStatus.TwoCherries then
+				first_slot_image = 2
+				first_slot_sprite:setImage(images_array[2]) 
+			elseif roll_status == RollStatus.OneCherry then
+				first_slot_image = 2
 				first_slot_sprite:setImage(images_array[2]) 
 			else
 				-- Need to select a random number, but it can't be 2 
 				local random_image_num = random_image_number()
-				first_slot_sprite:setImage(images_array[random_image_num]) -- TODO: Select a random image
+				first_slot_sprite:setImage(images_array[random_image_num])
+				first_slot_image = random_image_num
 			end
 			
 			-- If it is a lose scenario, then select something random
 		end
 		
 		if rotations < secondSlotRotations then
-			second_slot_sprite:setImage(images_array[modVal]) 
+			second_slot_sprite:setImage(images_array[second_image]) 
+			second_slot_image = second_image -- This works, I guess.  My code is confusing me!
 		elseif rotations == secondSlotRotations then
-			if (roll < 3) then -- Death
+			if (roll_status == RollStatus.Death) then -- Death
+				second_slot_image = 1
 				second_slot_sprite:setImage(images_array[1])
-			elseif roll < (5 + handicap) then
+			elseif roll_status == RollStatus.Diamonds then
+				second_slot_image = 4
 				second_slot_sprite:setImage(images_array[4]) 
-			elseif roll < (7 + handicap) then -- 3 Eyes
+			elseif roll_status == RollStatus.Eyes then -- 3 Eyes
+				second_slot_image = 3
 				second_slot_sprite:setImage(images_array[3])
-			elseif roll < (18 + handicap) then
+			elseif roll_status == RollStatus.ThreeCherries then
+				second_slot_image = 2
 				second_slot_sprite:setImage(images_array[2])
+			elseif roll_status == RollStatus.TwoCherries then
+				second_slot_image = 2
+				second_slot_sprite:setImage(images_array[2])
+			elseif roll_status == RollStatus.OneCherry then
+				-- This cannot be a cherry
+				-- Need to select a random number, but it can't be 2 
+				local random_image_num = random_image_number()
+				second_slot_sprite:setImage(images_array[random_image_num])
+				second_slot_image = random_image_num
+			else 
+				-- This probably could be any image...maybe do that, allow any option
+				local random_image_num = random_image_number()
+				second_slot_sprite:setImage(images_array[random_image_num])
+				second_slot_image = random_image_num
 			end 
 		end
 		
 		-- Assume that the third slot is still spinning here
-		third_slot_sprite:setImage(images_array[modVal]) 
+		third_slot_sprite:setImage(images_array[third_image]) 
+		third_slot_image = third_image
 		
 		if rotations == thirdSlotRotations then
-			if (roll < 3) then -- Death
+			if (roll_status == RollStatus.Death) then -- Death
 				third_slot_sprite:setImage(images_array[1])
-			elseif roll < (5 + handicap) then -- 3 Diamonds
+			elseif roll_status == RollStatus.Diamonds then -- 3 Diamonds
 				third_slot_sprite:setImage(images_array[4]) 
-			elseif roll < (7 + handicap) then -- 3 Eyes
+			elseif roll_status == RollStatus.Eyes then -- 3 Eyes
 				third_slot_sprite:setImage(images_array[3])
-			elseif roll < (18 + handicap) then
+			elseif roll_status == RollStatus.ThreeCherries then
 				third_slot_sprite:setImage(images_array[2])
+			elseif (roll_status == RollStatus.TwoCherries) or (roll_status == RollStatus.OneCherry) then
+				 local random_image_num = random_image_number()
+				 -- This cannot be a cherry
+				 -- Need to select a random number, but it can't be 2 
+				 third_slot_image = random_image_num
+				 
+				 -- I think this logic is correct, I just need to ensure that first_slot_image and
+				 -- second_slot_image are getting set for all cases.  Perhaps all of these values 
+				 -- should be determined at the start of the spin...
+				if (first_slot_image == second_slot_image) and (second_slot_image == third_slot_image) then
+					third_slot_image = random_image_number(second_slot_image)
+					print("LOST! All three images were the same: " .. second_slot_image)
+				end
+				 
+				third_slot_sprite:setImage(images_array[third_slot_image])
+			else -- Lost 
+				local random_image_num = random_image_number()
+				 third_slot_image = random_image_num 
+				 
+				 if (first_slot_image == second_slot_image) and (second_slot_image == third_slot_image) then
+					 third_slot_image = random_image_number(second_slot_image)
+					 print("LOST! All three images were the same: " .. second_slot_image)
+				 end
+				  
+				 third_slot_sprite:setImage(images_array[third_slot_image])
 			end
 		end 
 		
 		playBlipSound()
 	else
 	
+		is_currently_spinning = false 
 		local winnings = 0
 		
 		if (roll < 3) then 
