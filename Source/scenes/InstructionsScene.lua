@@ -4,7 +4,26 @@ local scene = InstructionsScene
 local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
 
+local default_font <const> = gfx.getSystemFont("normal")
+local sierra_font <const> = gfx.font.new("fonts/Sierra-AGI-Basic-Latin-and-Supplement")
+
+local betting2 <const> = gfx.image.new("images/Betting2") -- Might need to remove this
+
 scene.baseColor = Graphics.kColorWhite
+
+InstructionsPage = {
+	Story = 1,
+	Directions = 2,
+	Betting = 3, 
+	-- GridView = 4,
+	-- Betting2 = 4,
+	Count = 4
+}
+
+local instructions_page = InstructionsPage.Story
+local titles = { "INSTRUCTIONS", "DIRECTIONS", "BETTING"}
+local titleText = titles[instructions_page] --  "*INSTRUCTIONS*"
+local instructionsText = "" -- Does this need to be a global var?
 
 -- The story so far...
 -- You've stranded at the Oasis Bar which has all the the appealing odor of a Monolith Burger's bathroom.
@@ -21,145 +40,53 @@ scene.baseColor = Graphics.kColorWhite
 -- Side thought: difficulty level to improve the chances of winning?
 
 
--- local background
--- local logo
--- local menu
-
--- local sequence
-
-local instructionsText
-
--- local instrState
-
--- InstructionsState = {
--- 	First,
--- 	Second,
--- 	Last
--- }
-
--- Check the YouTube video on how to load in and play MIDI files
--- This will involve taking the tracks, adding a synth player/instrument
--- to each track and then adding them back in.
-local synthPlayer = snd.synth.new(snd.kWaveSquare) -- kWaveSawtooth
--- synthPlayer:setADSR(0,0.2,1,0.5) -- may not be necessary
--- local midi = snd.sequence.new("../sounds/midiFile.mid")
-local midi = snd.sequence.new('sounds/Sound24-Square.mid')
--- local midi = snd.sequence.new('sounds/Sound7.mid')
--- local midi = snd.sequence.new('foo.midi')
-
-if (midi == nil) then
-	print("midi is empty!")
-else
-	-- says "userdata", but seeing the same thing even with a fake file
-	print("midi is of type: ", type(midi))
-end
-
--- Keep getting this crash
--- scenes/InstructionsScene.lua:52: bad argument #1 to 'getTrackAtIndex' (playdate.sound.sequence expected, got number)
--- stack traceback:
--- 	[C]: in field 'getTrackAtIndex'
--- 	scenes/InstructionsScene.lua:52: in main chunk
-
--- The solution: Need to use the : notation, not . notation
-
--- Try and get number of tracks from MIDI sequence
--- local trackCount = midi.getTrackCount()
--- print("track count: ", trackCount)
-
-local track1 = midi:getTrackAtIndex(1) -- May have to start at #2, experiment
-local track2 = midi:getTrackAtIndex(2)
-local track3 = midi:getTrackAtIndex(3) -- From what I saw in Logic Pro, doesn't seem to be much here, but useful in case there is a three track MIDI file, which would have been appropriate for 3-voice Tandy sound.
-
-track1:setInstrument(synthPlayer:copy())
-track2:setInstrument(synthPlayer:copy())
-track3:setInstrument(synthPlayer:copy())
-midi:setTrackAtIndex(1, track1)
-midi:setTrackAtIndex(2, track2)
-midi:setTrackAtIndex(3, track3)
--- midi:setTempo(80)
-midi:setTempo(200) -- 200 for Sound24
-
 function scene:init()
 	scene.super.init(self)
 	
-	
-	-- instrState = InstructionsState.First
-
 	instructionsText = "You're stranded at the Oasis Bar which has all the \nappealing odor of a Monolith Burger's bathroom.\n\nYour only hope is to earn 250 Buckazoids at the \nSlots-o-Death so you can buy a ship and get off \nthis crusty rock of a planet."
 
-	-- background = Graphics.image.new("assets/images/background2")
-	-- logo = Graphics.image.new("libraries/noble/assets/images/NobleRobotLogo")
-
--- 	menu = Noble.Menu.new(false, Noble.Text.ALIGN_LEFT, false, Graphics.kColorBlack, 4,6,0, Noble.Text.FONT_SMALL)
--- 
--- 	menu:addItem(Noble.TransitionType.DIP_TO_BLACK, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
--- 	menu:addItem(Noble.TransitionType.DIP_TO_WHITE, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
--- 	menu:addItem(Noble.TransitionType.DIP_METRO_NEXUS, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
--- 	menu:addItem(Noble.TransitionType.DIP_WIDGET_SATCHEL, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.DIP_WIDGET_SATCHEL) end)
--- 	menu:addItem(Noble.TransitionType.CROSS_DISSOLVE, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.CROSS_DISSOLVE) end)
--- 	menu:addItem(Noble.TransitionType.SLIDE_OFF_UP, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.SLIDE_OFF_UP) end)
--- 	menu:addItem(Noble.TransitionType.SLIDE_OFF_DOWN, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN) end)
--- 	menu:addItem(Noble.TransitionType.SLIDE_OFF_LEFT, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.SLIDE_OFF_LEFT) end)
--- 	menu:addItem(Noble.TransitionType.SLIDE_OFF_RIGHT, function() Noble.transition(ExampleScene, 1, Noble.TransitionType.SLIDE_OFF_RIGHT) end)
--- 	menu:addItem(
--- 		"Score",
--- 		function()
--- 			local newValue = math.random(100,99999)
--- 			Noble.GameData.set("Score", newValue)
--- 			menu:setItemDisplayName("Score", "Change Score: " .. newValue)
--- 		end, nil,
--- 		"Change Score: " .. Noble.GameData.get("Score")
--- 	)
-
---	local crankTick = 0
-
 	scene.inputHandler = {
-		upButtonDown = function()
-			print("Try and play midi file")
-			midi:play()
-			midi:setLoops(0)
-		end,
-		downButtonDown = function()
-			midi:stop()
-		end,
-		-- upButtonDown = function()
-		-- 	menu:selectPrevious()
-		-- end,
-		-- downButtonDown = function()
-		-- 	menu:selectNext()
-		-- end,
-		-- cranked = function(change, acceleratedChange)
-		-- 	crankTick = crankTick + change
-		-- 	if (crankTick > 30) then
-		-- 		crankTick = 0
-		-- 		menu:selectNext()
-		-- 	elseif (crankTick < -30) then
-		-- 		crankTick = 0
-		-- 		menu:selectPrevious()
-		-- 	end
-		-- end,
-		-- AButtonDown = function()
-		-- 	menu:click()
-		-- end,
 		AButtonDown = function()
-			instructionsText = "And here is some other text"
+			change_page(1) 
 		end,
 		BButtonDown = function()
-			-- Go back to the previous screen
-			Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
-			-- print("Go back to the title screen")
+			
+			if instructions_page == InstructionsPage.Story then
+				-- Go back to the previous screen
+				Noble.transition(TitleScene, 1, Noble.TransitionType.DIP_TO_WHITE)
+			else
+				change_page(-1)
+			end
+			
 		end
 		
 	}
 
 end
 
+-- Go forward or backwards a page in the Instructions.
+-- page_num is 1 to go forward and -1 to go backwards
+function change_page(page_num) 
+
+	-- Incrementing, going forward a page
+	if page_num > 0 then
+		if (instructions_page < InstructionsPage.Count - 1) then
+			instructions_page += 1
+		end
+	end 
+	
+	-- Decrementing, going back a page
+	if page_num < 0 then
+		if (instructions_page > 1) then
+			instructions_page -= 1
+		end
+	end 
+	
+	titleText = titles[instructions_page]
+end
+
 function scene:enter()
 	scene.super.enter(self)
-
-	sequence = Sequence.new():from(0):to(100, 1.5, Ease.outBounce)
-	sequence:start();
-	
 	
 	local sierraFont = gfx.font.new('fonts/Sierra-AGI-Basic-Latin-and-Supplement')
 	-- gfx.setFont(sierraFont)
@@ -171,92 +98,140 @@ function scene:enter()
 	-- system_font <const> = 
 	-- gfx.setFont(system_font, playdate.graphics.font.kVariantItalic);
 	
-
-
 end
 
 function scene:start()
 	scene.super.start(self)
-
-	-- s:play()
-
-	-- menu:activate()
-	-- Noble.Input.setCrankIndicatorStatus(true)
-
 end
 
 function scene:drawBackground()
 	scene.super.drawBackground(self)
-
-	-- background:draw(0, 0)
 end
 
 function scene:update()
 	scene.super.update(self)
 
--- 	Graphics.setColor(Graphics.kColorWhite)
--- 	Graphics.setDitherPattern(0.2, Graphics.image.kDitherTypeScreen)
--- 	Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
--- 	-- menu:draw(30, sequence:get()-15 or 100-15)
--- 
-
 	-- local myRoobertFontInstance <const> = playdate.graphics.font.new("Roobert-24-Medium")
 	-- playdate.graphics.setFont(myRoobertFontInstance)
 	-- myRoobertFontInstance:drawText("Some experimental text", 40, 60)
-
+	
+	-- Header
 	Graphics.setColor(Graphics.kColorBlack)
-	Graphics.fillRect(0, 0, 400, 25)
+	Graphics.fillRect(0, 0, 400, 28)
 	
-	Graphics.setColor(Graphics.kColorWhite)
--- 	Graphics.fillRoundRect(260, -20, 130, 65, 15)
-	-- logo:setInverted(false)
-	-- logo:draw(275, 8)
-	
-	-- Noble.Text.setColor(Graphics.kColorWhite)
-	-- Noble.Text.draw(__string, __x, __y[, __alignment=Noble.Text.ALIGN_LEFT[, __localized=false[, __font=Noble.Text.getCurrentFont()]]])
-	-- MAYBE draw a black box behind the title and set the text to white
+	-- Round rect border for the body content
+	gfx.setLineWidth(2)
+	gfx.drawRoundRect(0, 28, 400, 187, 4);
+
 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
-	Noble.Text.draw("*INSTRUCTIONS*", 200, 4, Noble.Text.ALIGN_CENTER)
+	Utilities.drawTextScaled(titleText, 200, 14, 2, sierra_font)
 	
-	-- Change the text to white
-	
-	-- Noble.Text.setColor(Graphics.kColorBlack)
 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillBlack)
-	gfx.drawText("_The story so far..._", 10, 40)
-	gfx.drawText(instructionsText, 10, 70)
 	
-	-- Ⓐ
-	-- Ⓑ
-	-- 🟨
-	-- ⊙
-	-- 🔒
-	-- 🎣
-	-- ✛
-	-- ⬆
-	-- ➡
-	-- ⬇
-	-- ⬅
-	
-	-- Noble.Text.draw("⬅️ ⬅", 10, 180, Noble.Text.ALIGN_LEFT);
-	-- Noble.Text.draw("Some icons: 🟨 ⊙ 🔒 🎣 ✛ ⬆️ ➡️ ⬇️ ⬅️", 10, 200, Noble.Text.ALIGN_LEFT)
-	Noble.Text.draw("Press Ⓐ to continue", 385, 220, Noble.Text.ALIGN_RIGHT) -- Ⓑ
-	
-	-- playdate.graphics.drawText("Your only hope to get off this crusty rock of a \nplanet is to earn 250 Buckazoids at the \n Slots-o-Death so you can buy a ship.", 10, 110)
-								
-	-- Your goal is to earn 250 Buckazoids at the Slots-o-Death so you can buy a ship and get off this crusty rock of a planet.
-	-- playdate.graphics.drawText("*INSTRUCTIONS*", 10, 40)
+	if (instructions_page == InstructionsPage.Story ) then
+		gfx.drawText("*The story so far...*", 10, 40)
+		gfx.drawText(instructionsText, 10, 70, kTextAlignment.left, 2.0)
+		
+		-- Ⓐ
+		-- Ⓑ
+		-- 🟨
+		-- ⊙
+		-- 🔒
+		-- 🎣
+		-- ✛
+		-- ⬆
+		-- ➡
+		-- ⬇
+		-- ⬅
+		
+		-- Noble.Text.draw("⬅️ ⬅", 10, 180, Noble.Text.ALIGN_LEFT);
+		-- Noble.Text.draw("Some icons: 🟨 ⊙ 🔒 🎣 ✛ ⬆️ ➡️ ⬇️ ⬅️", 10, 200, Noble.Text.ALIGN_LEFT)
+		
+		Graphics.setColor(Graphics.kColorBlack)
+		Graphics.fillRect(0, 215, 400, 25)
+		
+		playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
+		Noble.Text.draw("*Main Menu* Ⓑ", 10, 219, Noble.Text.ALIGN_LEFT)
+		Noble.Text.draw("*Directions* Ⓐ", 390, 219, Noble.Text.ALIGN_RIGHT) -- Ⓑ
+		
+	elseif (instructions_page == InstructionsPage.Directions) then 
+		
+		-- Reminder: Need to set the image draw mode to gfx.kDrawModeWhiteTransparent for the PD icons to appear correctly.
+		gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)		
+		gfx.drawText("*Goal:* \nEarn 250 Buckazoids to win, but beware of \ngetting three skulls or losing all of your money!", 10, 40, kTextAlignment.left, 2.0)
+		gfx.drawTextAligned("*Controls:*\n⬆  :  Raise your bet\n⬇  :  Lower your bet\nⒶ or 🎣  :  Spin", 10, 110, kTextAlignment.left, 5.0)
+		
+		Graphics.setColor(Graphics.kColorBlack)
+		Graphics.fillRect(0, 215, 400, 25)
+		
+		playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
+		
+		Noble.Text.draw("*Story* Ⓑ", 10, 219, Noble.Text.ALIGN_LEFT)
+		Noble.Text.draw("*Betting* Ⓐ", 390, 219, Noble.Text.ALIGN_RIGHT)
+
+	elseif (instructions_page == InstructionsPage.Betting) then 
+		
+		-- Border around the body content
+		gfx.setLineWidth(2)
+		-- drawRoundRect for just the outline, fillRoundRect for a filled version
+		gfx.drawRoundRect(10, 40, 380, 164, 4) -- Black border 
+		gfx.fillRoundRect(10, 40, 380, 20, 4) -- Background fill for the headers
+		
+		-- Line to separate the section header
+		gfx.drawLine(10, 60, 390, 60)
+		-- Vertical line 
+		gfx.drawLine(200, 60, 200, 204)
+		
+		gfx.drawText("1  Cherry \n2 Cherries \n3 Cherries \n3 Eyes \n3 Diamonds \n3 Skulls ", 20, 70, kTextAlignment.left, 2.0); -- 70
+		gfx.drawText("Wins 1 \nWins 3 \nWins 5 \nWins 10 \nWins 20 \n= DEATH!", 120, 70, kTextAlignment.left, 2.0);
+		gfx.drawText("1  =  1x Payoff\n2 = 2x Payoff\n3 = 3x Payoff", 210, 70, kTextAlignment.left, 2.0) -- 240, 70
+		
+		-- Set the draw mode so the image isn't all black 
+		-- gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)	
+		-- betting2:draw(300, 120);
+		
+		-- Bottom bar 
+		Graphics.setColor(Graphics.kColorBlack)
+		Graphics.fillRect(0, 215, 400, 25)
+		
+		playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
+		gfx.drawText("*Winnings*", 18, 42)
+		gfx.drawText("*Bet*", 208, 42)
+		Noble.Text.draw("*Directions* Ⓑ", 10, 219, Noble.Text.ALIGN_LEFT)
+		-- Noble.Text.draw("*GridView* Ⓐ", 390, 219, Noble.Text.ALIGN_RIGHT)
+		
+	-- elseif (instructions_page == InstructionsPage.GridView) then
+	-- 	
+	-- 	-- Bottom bar 
+	-- 	Graphics.setColor(Graphics.kColorBlack)
+	-- 	Graphics.fillRect(0, 215, 400, 25)
+	-- 	
+	-- 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
+	-- 	
+	-- 	Noble.Text.draw("*Betting* Ⓑ", 10, 219, Noble.Text.ALIGN_LEFT)
+	-- 	
+	-- 	listview:drawInRect(220, 20, 160, 210)
+	-- 	playdate.timer:updateTimers()
+		
+	-- elseif (instructions_page == InstructionsPage.Betting2) then
+	-- 	
+	-- 	gfx.drawText("*Betting*", 10, 40)
+	-- 	
+	-- 	gfx.drawText("Bet:\n1  =  1x Payoff\n2 = 2x Payoff\n3 = 3x Payoff", 10, 70)
+	-- 	
+	-- 	Noble.Text.draw("Betting Ⓑ", 10, 215, Noble.Text.ALIGN_LEFT)
+		
+	end 
 
 end
 
 function scene:exit()
 	scene.super.exit(self)
-
-	Noble.Input.setCrankIndicatorStatus(false)
-	sequence = Sequence.new():from(100):to(240, 0.25, Ease.inSine)
-	sequence:start();
-
 end
 
 function scene:finish()
 	scene.super.finish(self)
+	-- This then causes the background image on the Title Scene to go all black
+	-- Called at this point so the transition effect works
+	gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
 end

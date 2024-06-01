@@ -1,0 +1,36 @@
+TODO:
+
++ Add Sierra AGI font for the title
++ Be able to increase the size of the title (text are treated as images)
+
+- Instructions Sceen
+	- The Story So Far screen
+	- How to use/Directions (raise, lower bet, how to spin)
+	- Betting odds (diamonds, eyes, cherries, skulls)
+	
+- Game Scene
+	- Finish flushing out the background graphics
+	- Display the laser and shoot the player (with sound)
+		- Get these image assets and create B&W versions
+	+ Fix the sound balance of the "lost spin" sound.  Or lower the other sounds.
+	- Do not allow multiple sounds to play at the same time (win sound and then trying to spin again).
+	
+- End Scene
+	+ Make larger font.
+	/ Add graphics, animations, etc.
+	- Why isn't the music stopping when leaving the screen?
+	
+- Title Scene
+	- Display version number (if this just remains a big bucket of hurt, skip it)
+	
+- Credits Scene
+	- Scroll text
+	- Squash the credits and play march 
+
+- General 
+	- Once the game is nearly complete, remove any unnecessary files, libraries, etc. to keep the game as small as possible.
+	- Restore game state when returning (be able to continue game, returning to the Main Menu might be fine.)
+
+- Bugs
+	- When jumping from the Game to End scene after winning, multiple sounds can be playing.
+	- Avoid other cases where multiple sounds can be playing.

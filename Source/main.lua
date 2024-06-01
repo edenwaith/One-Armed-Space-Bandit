@@ -2,6 +2,7 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
+import "CoreLibs/ui" -- Used for GridView
 -- import '../toyboxes/toyboxes.lua'
 -- import 'roomy-playdate'
 -- import "TitleScreen"
@@ -44,5 +45,5 @@ Noble.GameData.setup({
 Noble.showFPS = false
 
 -- Load in the TitleScene
-Noble.new(TitleScene, 1.5, Noble.TransitionType.CROSS_DISSOLVE)
+Noble.new(TitleScene, 1.5, Noble.TransitionType.CROSS_DISSOLVE) -- CROSS_DISSOLVE -- SLIDE_OFF_DOWN
 

@@ -9,7 +9,7 @@ scene.baseColor = Graphics.kColorBlack
 -- local menu
 local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
-local sequence
+local sequence -- probably can get rid of this: TODO: Clean up
 local money = 30
 -- NOTE: Lua uses snake case to name variables and methods
 local currentBet = 1
@@ -19,8 +19,8 @@ local is_crank_starting = false
 local is_currently_spinning = false 
 -- local difficulty = gameDifficulty() -- 1 is hard, 2 is medium, 3 is easy
 -- local handicap = (difficulty - 1) * 5
-local youLostMessages = {"You Lose", "Tough Luck", "It's Hopeless", "Eat Sand", "Suck Methane", "So Sorry", "Not A Chance"}
-local spinMessage = "Press Ⓐ or pull the crank down to spin"
+local youLostMessages = {"*You Lose*", "*Tough Luck*", "*It's Hopeless*", "*Eat Sand*", "*Suck Methane*", "*So Sorry*", "*Not A Chance*"}
+local spinMessage = "*Press* Ⓐ *or pull the crank down to spin*"
 
 local roll = 0
 
@@ -162,7 +162,7 @@ function scene:init()
 		rightButtonHold = function()
 			print("You're broke!")
 			Noble.GameData.Status = GameStatus.Broke 
-			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+			Noble.transition(EndGameScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
 		end,
 		rightButtonUp = function()
 			print("Right button up")
@@ -175,7 +175,7 @@ function scene:init()
 		BButtonDown = function()
 			if is_currently_spinning == false then
 			-- Go back to the previous screen
-				Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
+				Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN) -- SLIDE_OFF_DOWN
 			end
 		end
 		
@@ -195,8 +195,10 @@ function scene:enter()
 	-- Might only need to set this if the player isn't already playing
 	-- Or have some other option to continue an existing game
 	if Noble.GameData.Status == GameStatus.New then
+		-- Idea: Perhaps adjust the initial amount of $ to differ based on difficulty level
 		money = 30
 		roll_status = RollStatus.NotPlaying
+		spinMessage =  "*Press* Ⓐ *or pull the crank down to spin*"
 	end 
 	
 	Noble.GameData.Status = GameStatus.Playing
@@ -274,7 +276,7 @@ function scene:update()
 	Graphics.setColor(Graphics.kColorBlack)
 	Graphics.fillRect(0, 0, 400, 25)
 	
-	-- Graphics.setColor(Graphics.kColorBlack)
+	-- Dark black bar at bottom of the screen
 	Graphics.fillRect(0, 215, 400, 25)
 -- 	
  	Graphics.setColor(Graphics.kColorWhite)
@@ -391,6 +393,7 @@ function spin()
 	spinMessage = "" -- Reset this message on a new spin
 	
 	if (currentBet > money) then
+		is_currently_spinning = false 
 		spinMessage = "Sorry, you don't have enough to bet that much."
 	else
 	
@@ -581,7 +584,11 @@ function continueSpinning()
 		if (roll < 3) then 
 			money = -1
 			spinMessage = "You lose, homeboy!"
-			playSound66()
+			-- playSound66()
+			
+			-- TODO: Display the laser and play the appropriate sound
+			-- Then transition to the EndGameScene 
+			
 			Noble.GameData.Status = GameStatus.Death
 			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
 			
@@ -610,7 +617,7 @@ function continueSpinning()
 			msgNum = math.random(1, 7)
 			spinMessage = youLostMessages[msgNum]
 			print(youLostMessages[msgNum])
-			playSound27()
+			playYouLostSound()
 			
 			if (money <= 0) then
 				Noble.GameData.Status = GameStatus.Broke
@@ -620,7 +627,8 @@ function continueSpinning()
 		end
 		
 		if winnings > 0 then
-			spinMessage = "You won $" .. winnings
+			-- The * are to create bold text
+			spinMessage = "*You won $" .. winnings .. "*"
 			playSound26()
 			
 			if (money >= 250) then
@@ -653,18 +661,18 @@ end
 function playBlipSoundMIDI()
 	-- stopAllSounds()
 	
-	-- print("repeatCount is " .. repeatCount)
-	
 	local track1 = blipSound:getTrackAtIndex(1) -- May have to start at #2, experiment
 	local track2 = blipSound:getTrackAtIndex(2)
 	local track3 = blipSound:getTrackAtIndex(3) 
 	
 	-- scenes/GameScene.lua:276: synths may only be in one instrument or channel at a time
-	-- local blipSynthPlayer = synthPlayer:copy()
+	local blipSynthPlayer = synthPlayer:copy()
+	-- Lower the volume of the blip sound
+	blipSynthPlayer:setVolume(0.3)
 	
-	track1:setInstrument(synthPlayer:copy())
-	track2:setInstrument(synthPlayer:copy())
-	track3:setInstrument(synthPlayer:copy())
+	track1:setInstrument(blipSynthPlayer:copy())
+	track2:setInstrument(blipSynthPlayer:copy())
+	track3:setInstrument(blipSynthPlayer:copy())
 	blipSound:setTrackAtIndex(1, track1)
 	blipSound:setTrackAtIndex(2, track2)
 	blipSound:setTrackAtIndex(3, track3)
@@ -705,6 +713,7 @@ end
 function playYouLostSound()
 	local mp3Player = snd.fileplayer.new("sounds/Sound27")
 	local currentVolume = mp3Player:getVolume()
+	-- The volume for this sound is much quieter than other sounds.  Possible to increase in code?
 	print("Current mp3Player volume: " .. currentVolume)
 	mp3Player:play()
 end
@@ -748,5 +757,6 @@ end
 
 function handicap()
 	local difficulty = gameDifficulty()
-	return (difficulty - 1) * 5
+	-- return (difficulty - 1) * 5 -- That was a major calculation error making the game more challenging! 
+	return difficulty * 5
 end

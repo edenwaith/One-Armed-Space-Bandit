@@ -7,5 +7,5 @@ buildNumber=100
 imagePath=SystemAssets
 -- launchSoundPath=sounds/win -- Needs to be very short, perhaps a crank sound?
 -- contentWarning=This game contains simulated gambling.  If you have a gambling problem, there is help.  Call 1-800-662-4357.
-pdxversion=20400
-buildtime=768577683
+pdxversion=20500
+buildtime=770527825

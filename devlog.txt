@@ -1,0 +1,61 @@
+18 May 2024:
+Considering my past habits of writing a devlog (especially short snippets which now would be ideal for microblogging), I'm amazed I haven't started this log until today to help record my journey of developing my first Playdate game, including any progress and issues I encounter, in addition to the blog entry I've slowly been building up, which I'll likely release around the time of One-Armed Space Bandit's release.
+
+Yesterday I made some good progress on the End Scene by creating some images for the Death and Won scenarios, and also developed a button in the style of an SCI0 game.
+
+I once again tried to display the version number on the Title Scene, but when I exit the Game Scene, it shows graphical issues where the old scene becomes somewhat transparent and looks very odd during the transition.  Here is the code I tried where the text is set to white and then the drawing mode is changed afterwards.
+
+-- When this fill is set, it then draw the background as white, which hides the background image		
+gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+local version_num = "v" .. playdate.metadata.version 
+Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+ 
+-- This is then set so the background image is visible 
+-- Unfortunately, when leaving the Game Scene, it causes weirdness here. :( )
+gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+
+I think my next steps are to either return to the Credits or Instructions scenes.  For the Credits screen, I might want the text to scroll before being smashed by the foot.  Also need to find an appropriate MIDI version of the Liberty Bell March to play.  Once that is in place, I think that scene will be complete.
+
+The Instructions scene still needs a lot of additional content, but I think once I flush out the rules and directions, it should be in a good state.
+
+I keep finding a lot of small issues and such.  Even on Easy mode, the game has been too difficult.  I then looked at how I was calculating the handicap and I noticed a major issue with my math (perhaps a remnant from some older code) and fixed that so the game shouldn't be quite so brutally difficult.
+
+The basic game logic is pretty solid, so playing the game is in place, and this product is starting to congeal and look like something!  Still plenty of parts missing, and then the necessary polish, but definitely some good progress.
+
+When I was trying to figure out how to print the specific Playdate icons/glyphs to indicate things like the buttons, D-pad directions, crank, etc., this took some time to figure out.  An older version of the Designing For Playdate documentation (v. 1.9.x) showed the appropriate icons of 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️ (plus the Ⓐ and Ⓑ buttons), but newer versions of the documentation excluded this info.  But when I tried to print these glyphs (just drawn like text), they appeared entirely black.  To fix this, I had to set the image draw mode to gfx.kDrawModeWhiteTransparent to make these glyphs appear correctly.
+
+-- Reminder: Need to set the image draw mode to gfx.kDrawModeWhiteTransparent for the PD icons to appear correctly.
+gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+Noble.Text.draw("Emoji _Glyphs!_ 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️", 200, 20, Noble.Text.ALIGN_CENTER)
+
+Today I flushed out more of the Instructions scene, I can move between three screens worth of content.  I worked some on one of the images (skulls, eyes, dimaonds).
+
+I noticed when I added the snd 191.aiff sound file into the sounds folder, the game stopped building.  Once I removed it, the game built properly again.
+
+On the credits screen, I want the text to scroll up.  (Side note, perhaps I should add credits to any beta testers.)  I should also look in to some method of reading in the credits from a text file.  I'm currently scrolling by running a timer and having a delta offset move the text.  I want to play The Liberty Bell March and once it completes, then have a foot squash the credits down.  SPLAT!
+
+
+19 May 2024:
+Converted the splat.aiff file to .wav using Audacity.  I looked around at other solutions, such as QuickTime Player, VLC, or Music, but Audacity was the most straightforward solution for what I was trying to do.  
+
+According to the Inside Playdate documentation (https://sdk.play.date/2.4.2/Inside%20Playdate.html#M-sound), export the .aiff file to .wav:
+
+File > Export Audio… > File type: WAV (Microsoft), Encoding: IMA ADPCM.
+
+This also had the bonus of reducing the file size from 5,994 bytes to 3,192 bytes, almost halving the file size.
+
+Figured out why the audio wasn't stopping when leaving the EndGameScene.  The method stopAllSounds() was being called, however this was calling the method in another file!  This is something quite nefarious and annoying with Lua.  Changed the method name to stopAllEndSceneSounds() and made the necessary changes within EndGameScene.lua.  Is there a better way to ensure that certain methods retain scope to their file?
+
+Performed some optimizations with the End Scene so it isn't loading up all possible songs or addiitional images, just have a single image or audio file and then set the appropriate asset as the scene initializes.
+
+
+28 May 2024:
+Lowered the "blip" sound so it isn't nearly as loud, even when the Playdate is on its lowest sound level.  This is now more in line with the volume of the "you lost" sound.
+
+Mostly worked on the Instructions screen, additional content, some new layout, modified how the A/B buttons are displayed at the bottom of the screen now.
+
+29 May 2024:
+On the Instructions screen(s), added a rounded border for the body content portion.  All three screens/pages now have a dark footer with the button text.  I might change the End Scene's button to be similar in style (even if I do like the Sierra-style SCI button.
+
+31 May 2024:
+Worked on the Instructions scene, which is now in a really good state.  Researched GridView to see if that would be something useful for the Bettings screen, but ended up just laying out the content and drew borders.  But the GridView would be useful for a menu system, I should look more into that.  Also made some other smaller adjustments on the first two pages on the spacing of the text and some layout.

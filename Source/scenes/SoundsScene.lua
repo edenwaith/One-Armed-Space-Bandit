@@ -147,14 +147,10 @@ function scene:init()
 		AButtonDown = function()
 			menu:click()
 		end,
-		-- AButtonDown = function()
-		-- 	instructionsText = "And here is some other text"
-		-- end,
 		BButtonDown = function()
 			stopAllSounds()
 			-- Go back to the previous screen
-			Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_RIGHT)
-			-- print("Go back to the title screen")
+			Noble.transition(TitleScene, 1, Noble.TransitionType.DIP_TO_WHITE)
 		end
 		
 	}
@@ -172,8 +168,6 @@ end
 function scene:start()
 	scene.super.start(self)
 
-	-- s:play()
-
 	menu:activate()
 	-- Noble.Input.setCrankIndicatorStatus(true)
 
@@ -181,8 +175,6 @@ end
 
 function scene:drawBackground()
 	scene.super.drawBackground(self)
-
-	-- background:draw(0, 0)
 end
 
 function scene:update()
@@ -197,9 +189,9 @@ function scene:update()
 	Graphics.setColor(Graphics.kColorBlack)
 	Graphics.setDitherPattern(0.8, Graphics.image.kDitherTypeScreen) -- original value was 0.2
 	-- Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
-	Graphics.fillRoundRect(15, 50, 185, 145, 15)
+	Graphics.fillRoundRect(0, 215, 400, 25, 0)
 	-- menu:draw(30, sequence:get()-15 or 100-15)
-	menu:draw(30, 50)
+	menu:draw(30, 40)
 	
 	Graphics.setColor(Graphics.kColorWhite)
 	Graphics.fillRoundRect(260, -20, 130, 65, 15)
@@ -227,7 +219,8 @@ function scene:update()
 	
 	-- Noble.Text.setColor(Graphics.kColorBlack) -- causes a crash
 	gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
-	Noble.Text.draw("Press Ⓑ to return to the main menu", 385, 220, Noble.Text.ALIGN_RIGHT) -- Ⓐ or Ⓑ
+	Noble.Text.draw("*Main Menu* Ⓑ", 385, 220, Noble.Text.ALIGN_RIGHT)
+	 -- Ⓐ or Ⓑ
 	
 	-- playdate.graphics.drawText("Your only hope to get off this crusty rock of a \nplanet is to earn 250 Buckazoids at the \n Slots-o-Death so you can buy a ship.", 10, 110)
 								
@@ -247,6 +240,9 @@ end
 
 function scene:finish()
 	scene.super.finish(self)
+	-- This then causes the background image on the Title Scene to go all black
+	-- Called at this point so the transition effect works
+	gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
 end
 
 function playChestSound()
