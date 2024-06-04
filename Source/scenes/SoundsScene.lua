@@ -46,6 +46,7 @@ local sineSynthPlayer = snd.synth.new(playdate.sound.kWaveSine)
 local triangleSynthPlayer = snd.synth.new(playdate.sound.kWaveTriangle)
 -- synthPlayer:setADSR(0,0.2,1,0.5) -- may not be necessary
 -- local midi = snd.sequence.new("../sounds/midiFile.mid")
+local libertyBell = snd.sequence.new('sounds/Liberty_Bell/Liberty-Bell')
 local sound7 = snd.sequence.new('sounds/Sound7.mid')
 local sound24 = snd.sequence.new('sounds/Sound24-Square.mid')
 local sound25 = snd.sequence.new('sounds/Sound25.mid')
@@ -54,6 +55,7 @@ local sound27 = snd.sequence.new('sounds/Sound27-Square.mid')
 local sound28 = snd.sequence.new('sounds/Sound28.mid')
 local sound66 = snd.sequence.new('sounds/Sound66.mid')
 
+local libertyBellWavPlayer = snd.fileplayer.new("sounds/Liberty_Bell/liberty_bell_march")
 
 -- Keep getting this crash
 -- scenes/InstructionsScene.lua:52: bad argument #1 to 'getTrackAtIndex' (playdate.sound.sequence expected, got number)
@@ -82,13 +84,15 @@ function scene:init()
 	menu = Noble.Menu.new(false, Noble.Text.ALIGN_LEFT, false, Graphics.kColorBlack, 4,6,0, Noble.Text.FONT_MEDIUM)
 	-- menu:addItem("Sound2", playSound7) -- Just temp code stuff
 	-- menu:addItem("Sound7", playSound7)
-	menu:addItem("Chest", playChestSound)
+	-- menu:addItem("Chest", playChestSound)
+	menu:addItem("Liberty Bell March", playLibertyBellSound)
 	menu:addItem("Sound24", playSound24)
 	menu:addItem("Sound25", playSound25)
 	menu:addItem("Sound26", playSound26)
 	menu:addItem("Sound27", playSound27)
 	menu:addItem("Sound28", playSound28)
 	menu:addItem("Sound66", playSound66)
+	menu:addItem("Splat", playSplatSound)
 	
 	-- Sounds to test:
 	-- Sound7: Death tune
@@ -271,6 +275,42 @@ function playChestSound()
 	chestSequence:play()
 end
 
+function playLibertyBellSound()
+	playLibertyBellWav()
+	-- playLibertyBellMIDI()
+end
+
+function playLibertyBellWav()
+	stopAllSounds()
+	
+	
+	assert(libertyBellWavPlayer)
+	local currentVol = libertyBellWavPlayer:getVolume()
+	print("currentVol: " .. currentVol)
+	libertyBellWavPlayer:play()
+	-- libertyBellWavPlayer:stop()
+end
+
+function playLibertyBellMIDI()
+	stopAllSounds()
+	
+	local track1 = libertyBell:getTrackAtIndex(1)
+	-- local track2 = libertyBell:getTrackAtIndex(2)
+	-- local track3 = libertyBell:getTrackAtIndex(3)
+
+	-- This keeps crashing and says track1 is nil.  Is the MIDI file not loading properly?	
+	track1:setInstrument(synthPlayer:copy())
+	-- track2:setInstrument(synthPlayer:copy())
+	-- track3:setInstrument(synthPlayer:copy())
+	
+	libertyBell:setTrackAtIndex(1, track1)
+	-- libertyBell:setTrackAtIndex(2, track2)
+	-- libertyBell:setTrackAtIndex(3, track3)
+	
+	libertyBell:setTempo(200)
+	libertyBell:play()
+end 
+
 -- This one also doesn't sound great, like some notes are missing.
 -- For the troublesome audio files, might stick with mp3 or wav instead of MIDI
 -- I might try exporting this from one of the other Sierra games and see how that works.
@@ -441,7 +481,16 @@ function playSound66()
 	sound66:play()
 end
 
+function playSplatSound()
+	stopAllSounds()
+	
+	local wavPlayer = snd.fileplayer.new("sounds/splat")
+	wavPlayer:play()
+end
+
 function stopAllSounds()
+	libertyBellWavPlayer:stop()
+	libertyBell:stop()
 	sound7:stop()
 	sound24:stop()
 	sound25:stop()

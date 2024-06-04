@@ -54,8 +54,20 @@ Lowered the "blip" sound so it isn't nearly as loud, even when the Playdate is o
 
 Mostly worked on the Instructions screen, additional content, some new layout, modified how the A/B buttons are displayed at the bottom of the screen now.
 
+
 29 May 2024:
 On the Instructions screen(s), added a rounded border for the body content portion.  All three screens/pages now have a dark footer with the button text.  I might change the End Scene's button to be similar in style (even if I do like the Sierra-style SCI button.
 
+
 31 May 2024:
-Worked on the Instructions scene, which is now in a really good state.  Researched GridView to see if that would be something useful for the Bettings screen, but ended up just laying out the content and drew borders.  But the GridView would be useful for a menu system, I should look more into that.  Also made some other smaller adjustments on the first two pages on the spacing of the text and some layout.
+Worked on the Instructions scene, which is now in a really good state.  Researched GridView (https://sdk.play.date/2.5.0/Inside%20Playdate.html#_grid_view_sample_code) to see if that would be something useful for the Bettings screen, but ended up just laying out the content and drew borders.  But the GridView would be useful for a menu system, I should look more into that.  Also made some other smaller adjustments on the first two pages on the spacing of the text and some layout.
+
+
+1 June 2024:
+Returning to the Credits page, cleaned up several dozen lines of old code to get the file under 200 lines.  To trim the MIDI file the_liberty_bell_march.mid to cut off the start and a bunch of the end, first needed to use Garageband to trim the track (couldn't figure out how to perform a simple trim in Logic Pro), but then saved it out as a Garageband project, then opened it in Logic Pro X so I could then export the file as MIDI (Garageband wouldn't export a song as MIDI, only things like MP3, AAC, AIFF, WAV.  Added this march song and modified the timer to stop running after ~17 seconds (the length of the sound clip) and then play the splat sound afterwards.
+
+2 June 2024:
+Playing around with the animation of the scrolling credits and trying to get the timing right along with the sounds.
+
+3 June 2024:
+Added the foot image to the credits.  Took a bit of figuring out why the foot wasn't animating at the proper speed as the text, but eventually realized the text was up higher, so had to delay the foot animation until the text caught up.  Starting to look good!  Still need to play around with this a bit more to get everything workingly smoothly, but the basic concept is in the place.  Also have the animation sequence going in rotation now.  SPLAT!
