@@ -1,36 +1,74 @@
 TODO:
 
-+ Add Sierra AGI font for the title
-+ Be able to increase the size of the title (text are treated as images)
-
-- Instructions Sceen
-	- The Story So Far screen
-	- How to use/Directions (raise, lower bet, how to spin)
-	- Betting odds (diamonds, eyes, cherries, skulls)
++ Instructions Sceen
+	+ The Story So Far screen
+	+ How to use/Directions (raise, lower bet, how to spin)
+	+ Betting odds (diamonds, eyes, cherries, skulls)
 	
 - Game Scene
-	- Finish flushing out the background graphics
+	+ Finish flushing out the background graphics
+	+ Animations after a win
 	- Display the laser and shoot the player (with sound)
 		- Get these image assets and create B&W versions
 	+ Fix the sound balance of the "lost spin" sound.  Or lower the other sounds.
-	- Do not allow multiple sounds to play at the same time (win sound and then trying to spin again).
+	+ Do not allow multiple sounds to play at the same time (win sound and then trying to spin again).
 	
-- End Scene
++ End Scene
 	+ Make larger font.
-	/ Add graphics, animations, etc.
-	- Why isn't the music stopping when leaving the screen?
+	+ Add graphics, animations, etc. 
+		+ Still need the broke animation
+	+ Why isn't the music stopping when leaving the screen? (calling the method was calling from another file)
+	+ Finalize the text for all three types of endings (Won, Broke, Death)
 	
 - Title Scene
 	- Display version number (if this just remains a big bucket of hurt, skip it)
 	
 - Credits Scene
-	- Scroll text
-	- Squash the credits and play march 
+	/ Finish adding any other credits, beta testers, joke names/text, etc.
+	+ Scroll text
+	+ Find a suitable version of the Liberty Bell March (MIDI version)
+	+ Make proper version of the Splat sound
+	+ Play the Liberty Bell March
+	+ Finish designing the foot
+	+ Squash the credits 
+	/ Add a QR Code and/or URL at the end?
+	- Add a dedication and dithered image of Precious at the bottom.  Probably will need to increase the length of the song.
+	- Thanks (Panic, podcasts, Uncrank'd zine, PD community)
 
 - General 
+	+ Add Sierra AGI font for the title
+	+ Be able to increase the size of the title (text are treated as images)
 	- Once the game is nearly complete, remove any unnecessary files, libraries, etc. to keep the game as small as possible.
-	- Restore game state when returning (be able to continue game, returning to the Main Menu might be fine.)
+	+ Restore game state when returning (be able to continue game, returning to the Main Menu might be fine.)
+	/ Normalize sound effects across the entire game.  A lot of the MIDIs, in particular, are quite loud.  WAV files tend to be softer.
+		- Bump up the volume of the Liberty Bell March (20% or so).
+	- Create wrapping paper design
+	- When the Home menu is displayed and have the custom screen, perhaps show the controls like what Icy Dungeon displays?
 
 - Bugs
-	- When jumping from the Game to End scene after winning, multiple sounds can be playing.
-	- Avoid other cases where multiple sounds can be playing.
+	+ When jumping from the Game to End scene after winning, multiple sounds can be playing.
+	+ Avoid other cases where multiple sounds can be playing.
+	+ The death music seems to pause for a brief moment after it first starts.  I noticed that the synthVolume is getting set twice, one of those being right at when the song seems to hiccup. (Solution: playDeathSong() was called in two places!)
+	- When starting up the game, the title screen flashes briefly
+	+ After the "lost spin" sound, the controls aren't active for about another partial second.  Is the MP3 longer or just take a bit to call the callback function?  The MIDI sounds seem more immediate.
+	+ The You Lost sound has a bit of empty space before it plays, perhaps trim some of that off, as well.
+	+ Bump up the sound of the You Lost sound (sound27.mp3) a bit.  20% perhaps?  Ended up bumping twice by about 10dB.
+	/ After losing all of your money, play the final "lost" sound, then move to the end scene.
+	
+- Other
+	- Is it possible to enter a Konami-type code to cheat?
+	- More sounds, such as when pulling the crank or changing the bet amount?
+	- Beta testing
+	
+- Marketing
+	- Websites
+		- Itch.io
+			- Instructions how to play w/o a Playdate?
+		- Edenwaith
+	- Get the word out
+		- Discord channels
+		- Reddit
+		- Social media
+		- Uncrank'd zine
+	- Share & Enjoy
+		- Send copies or share details with Space Quest and Playdate fans

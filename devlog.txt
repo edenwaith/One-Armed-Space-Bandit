@@ -66,8 +66,90 @@ Worked on the Instructions scene, which is now in a really good state.  Research
 1 June 2024:
 Returning to the Credits page, cleaned up several dozen lines of old code to get the file under 200 lines.  To trim the MIDI file the_liberty_bell_march.mid to cut off the start and a bunch of the end, first needed to use Garageband to trim the track (couldn't figure out how to perform a simple trim in Logic Pro), but then saved it out as a Garageband project, then opened it in Logic Pro X so I could then export the file as MIDI (Garageband wouldn't export a song as MIDI, only things like MP3, AAC, AIFF, WAV.  Added this march song and modified the timer to stop running after ~17 seconds (the length of the sound clip) and then play the splat sound afterwards.
 
+
 2 June 2024:
 Playing around with the animation of the scrolling credits and trying to get the timing right along with the sounds.
 
+
 3 June 2024:
 Added the foot image to the credits.  Took a bit of figuring out why the foot wasn't animating at the proper speed as the text, but eventually realized the text was up higher, so had to delay the foot animation until the text caught up.  Starting to look good!  Still need to play around with this a bit more to get everything workingly smoothly, but the basic concept is in the place.  Also have the animation sequence going in rotation now.  SPLAT!
+
+
+4 June 2024:
+When I was testing out my recent work for the Credits screen, I did encounter a couple of issues.  If one leaves the screen and returns, the text was still in the original position.  There were also times that the music kept playing, so it seems like the timers weren't being cleared out, or perhaps after it repeats the old timers were not being deallocated.  Made a couple of fixes, when the scene finishes, reset the delta Y position for the text and foot image, and also reset those values in the enter() method.  Also made sure that after any timer expired to call the remove() method.  Hopefully this fixes the weird issues, otherwise I'll just have the credits scroll once, and then after that, let the user manually scroll through the credits.  I might even want to double the length of the intro song if it seems like the credits scroll too quickly.  I'll need to time other variants such as the Monty Python intro and Disinfectant's about screen.  Right now, the tune I have playing is about 16.5 seconds long.  The delay timers are still causing some bugs where if I leave the Credits scene, the music does keep playing.  Weird.  Ended up adding a bool check to gatekeep whether these should play or not.  Kind of a hacky fix.
+
+Created the skeleton framework for the itch.io page for the game.  The URL is https://edenwaith.itch.io/one-armed-space-bandit .  Added this URL to the credits.  Might still create a QR code.
+
+
+5 June 2024:
+Found a free stock image of a  broke piggy bank for the End Scene.  Flushed out more of the text, including several different messages for the Death Scene.  Also made a minor update to the Instructions page.  Adjusted the music to be at 20% of the original volume, this seems a lot better when played at the lowest level on the Playdate.
+
+6 or 7 June 2024:
+Researching how to save the user's state and doing some preliminary work in checking when the app closes vs. opens and what the Noble.GameData can handle.
+
+8 June 2024:
+Small tweak to one of the death messages.  Trying to get the Noble.GameData to save and restore properly.  Added the Money property and modified the GameScene to use Noble.GameData.Money instead of the local money variable. But trying to save this value to disk and restore it doesn't seem to work as expected.  Might just handle this manually via how the Playdate documentation recommends via https://sdk.play.date/2.5.0/Inside%20Playdate.html#saving-state .
+
+9 June 2024:
+Still wrestling with the GameData and trying to save and load the data.  The Bet value kept on being nil for some unknown reason.  Changed the local currentBet variable in the Game scene to make use of the Noble.GameData.Bet, instead.  Probably will just manually save the data using's Playdate's APIs and not the Noble engine's approach.  Fortunately, there are only a few pieces of data to read in.
+
+11 June 2024:
+Stopped bashing my head against the wall in trying to get the Noble.GameData to save and load properly, making use of the playdate.datastore, instead, and that seems to work a lot better.
+
+12 June 2024:
+Getting the loading and saving working by working wwith the playdate.datastore.  Works well in the simulator, but it caused my Playdate to crash when I installed it.  The game crashed when trying to go to the game, something about the Bet value.
+
+scenes/GameScene.lua:273: attempt to concatenate a nil value (field 'Bet')
+stack traceback:
+    scenes/GameScene.lua:273: in method 'update'
+echo off
+target=dvt1
+build=216ce27b-2.5.0-release.169289-buildbot-240523
+boot_build=216ce27b-2.5.0-release.169289-buildbot
+SDK=2.5.0
+pdxversion=20500
+serial#=PDU1-Y005573
+cc=9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]
+pcbver=0x01
+time and date set
+
+Easily fixed this crash by ensuring that there is a valid Bet value before starting a new game.
+
+13/14 June 2024:
+Fixed the issue in the Game Scene where multiple sounds might be playing at the same time.  I also encountered an issue when Sound26 was playing, it was actually calling the method from the Sound Scene, not the same-named method in the Game Scene.  I still need to find a fix for this issue, something with the Noble engine, or is it just Lua?
+
+15 June 2024:
+Updated the You Lost sound so it is a little louder (~10dB) and cut off part of the end, which made it feel like that the sound was too long.  The start of the sound also has a bit of emptiness, so I might trim off some of that, as well.  Read up on animations and image tables.  Made an ordered dither version of the glowing diamond.  I noticed that some of the originals are 56px in width, but some of my black & white images are 54px wide, I probably clipped the canvas on those images.  I might need to make these small edits to any new images for the animated images.
+
+16 June 2024:
+Creating the images to use for animations and image tables.  Each of the images which are created have a format like <image name>-table-<sequence number>.png (e.g. cherries-table-1.png).  I tried to create the animation loops and place them into the game, but I never saw anything appear.  I might just try loading up the image tables into the existing sprites, instead.
+
+18 June 2024:
+Trimmed off a bit to the start of the You Lost sound.  Bumped up the sound to the Liberty Bell March wave file.  May not be quite loud enough for my tastes, but I'm trying.  Also creating the diamondsImageTable.  Got an initial animation loop to work in a sprite, but the animated sprite doesn't clear out, so I'll need to reset something when spinning again, perhaps remove the sprite and readd it.
+
+19 June 2024:
+Got the animations working for cherries and diamonds.  Just needed to null out the update method on the sprite to clear it out when rolling again.  Need to work on the eyes and skulls animations now.  When continuing the game, it keeps the old slot images, this was a pretty easy and quick fix.
+
+26 June 2024:
+I had noticed I was seeing a lot of cases with 3 Diamonds, but very few cases of 3 Eyes.  The issue was due to the addition of the handicap for the easier modes, where 3 Diamonds could easily appear far more than 3 Eyes, which was still only two point difference above 3 Diamonds.  I halved the handicap for 3 Diamonds, so 3 Diamonds should not appear as often, but 3 Eyes can appear more often.  This change should balance out the game play for the easier modes.
+
+2 July 2024:
+Starting work on the Wrapping Paper image (wrapping-pattern.png) and testing it in the Simulator.  Also trying to test out the content warning phrase.
+
+6 July 2024:
+Worked on the background graphics for the game scene.  Added some dots to the border and then beveled the white rectangles and added some drop shadow.  I tried some dithered patterns for light and dark grey, but they didn't look very good.  All of this new art was done by hand, no filters used.
+
+7 July 2024:
+When working on the Slots-Background image yesterday, I accidentally hid the Black Square layer, which is necessary.  Oops.  Added that back in.  Added a little extra shading for Bevel Shading - Left layer so that the left rectangle stands out a bit more.  The other two rectangles already look good, but that is based upon where they laid on the background, so it already looks like there is one extra column of shadow.
+
+11 July 2024:
+Working on the laser image.  Needed to stretch out the laser shot so it is long enough for the Playdate screen.  The ordered dither pattern for the laser looks pretty good, but error dithering looks awful.  The laser canon (cannon?) looks good either way.
+
+Took a look at the current size of this game as reported by Playdate, and it currently comes in at 3.4MB, not quite as large as I thought, but I bet a bunch of that is from extra images and sound files which just need to be removed.  Getting this game under 2MB is a good goal.
+
+12 July 2024:
+Working on the laser table images.  This will require a decent amount of work to get the images to fit into the slot, but I'm working out the basic idea.  The laser itself looks pretty decent.  Also encountered an obscure bug if I leave the simulator just as the laser is shooting, then restart the game in Nova, it thought the game was still going, even though the player has -1 Buckazoids.
+
+16 July 2024:
+Shortened the YouLost-Shorter.mp3 file to clip off the empty space at the start of the sound clip.  Made YouLost-Even-Shorter.mp3, and trimmed off another KB from the previous song.  Adjusted the laser-table images so they are 190px in height so I don't have to adjust the position of the second slot sprite, since the moveTo() function sets a sprite by its center, not a corner.
+

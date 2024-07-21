@@ -34,21 +34,30 @@ function scene:enter()
 	scene.super.enter(self)
 	
 	local gameStatus = Noble.GameData.Status
+	local thankYouMessage = "\n\nThank you for playing\nOne-Armed Space Bandit."
 	
 	if (gameStatus == GameStatus.Death) then
-		end_game_title = "WAY TO GO, BEANPOLE!"
-		end_game_message = "Congratulations on your \nrecent death! \nYou lose homeboy!"
+		end_game_title = "WAY TO GO, WING NUT!" 
+		local randomDeathNum = math.random(1, 3)
+		-- Congratulations on your \nrecent death! 
+		local deathMessages = {
+			"You've demonstrated your \ninability to sustain life.  \nYou quickly glance around \nthe room to see if anyone \nsaw you blow it.",
+		-- As you lie on the floor in a smoldering, carbogelatinous heap you can't help but wonder why you bothered getting up this morning.
+			"Another senseless death. \nYou can help prevent this:  \nVote YES on Lobotomies \nfor Playdate Developers.",
+			"Moments before getting \nvaporized, you wonder why \nyou bothered getting up \nthis morning."
+		}
+		
+		end_game_message = deathMessages[randomDeathNum] .. thankYouMessage
 		end_image = gfx.image.new('images/Fried')
 		end_song = snd.sequence.new('sounds/Sound66.mid')
-		playDeathSong()
 	elseif (gameStatus == GameStatus.Broke) then
 		end_game_title = "YOU'RE BROKE!"
-		end_game_message = "Pound sand, you bum!" -- "Hit the road, freeloader!" -- "You're broke! Eat sand, you bum!"
-		end_image = gfx.image.new('images/Fried')
+		end_game_message =  "Hit the road, freeloader!\nYou spend your remaining \ndays dumpster diving behind \nthe Oasis Bar." .. thankYouMessage -- Pound sand, you bum!" -- "Hit the road, freeloader!" -- "You're broke! Eat sand, you bum!"
+		end_image = gfx.image.new('images/poor3')
 		end_song = snd.sequence.new('sounds/Sound25-LSL.mid')
 	elseif (gameStatus == GameStatus.Won) then
 		end_game_title = "YOU WON!"
-		end_game_message = "Now it's time to blow this \ntaco stand!"
+		end_game_message = "You collect your newly earned \nfilthy lucre and head off to \nTiny's Used Space Ship Lot. \nNow it's time to blow this \ntaco stand!"
 		end_image = gfx.image.new('images/Buckazoidsq1')
 		end_song = snd.sequence.new('sounds/Sound24-Square.mid')
 	else
@@ -142,6 +151,8 @@ function playWinSong()
 	local track2 = end_song:getTrackAtIndex(2)
 	local track3 = end_song:getTrackAtIndex(3) 
 	
+	synthPlayer:setVolume(0.2)
+	
 	track1:setInstrument(synthPlayer:copy())
 	track2:setInstrument(synthPlayer:copy())
 	track3:setInstrument(synthPlayer:copy())
@@ -161,6 +172,11 @@ function playBrokeSong()
 	local track1 = end_song:getTrackAtIndex(1)
 	local track2 = end_song:getTrackAtIndex(2)
 	
+	-- local tempSynthPlayer = synthPlayer:copy()
+	-- tempSynthPlayer:setVolume(0.2)
+	
+	synthPlayer:setVolume(0.2)
+	
 	track1:setInstrument(synthPlayer:copy())
 	track2:setInstrument(synthPlayer:copy())
 	
@@ -173,15 +189,16 @@ function playBrokeSong()
 end
 
 function playDeathSong()
+	print("playDeathSong")
 	stopAllEndSceneSounds()
 	
 	local track1 = end_song:getTrackAtIndex(1)
 	local track2 = end_song:getTrackAtIndex(2)
 	local track3 = end_song:getTrackAtIndex(3) 
 	
-	synthPlayer:setVolume(0.5)
+	synthPlayer:setVolume(0.2)
 	local synthVolume = synthPlayer:getVolume()
-	print("synthVolume is " .. synthVolume)
+	print("playDeathSong: synthVolume is " .. synthVolume)
 	
 	track1:setInstrument(synthPlayer:copy())
 	track2:setInstrument(synthPlayer:copy())

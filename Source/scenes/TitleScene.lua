@@ -94,6 +94,9 @@ end
 
 function transitionNewGame()
 	Noble.GameData.Status = GameStatus.New 
+	if Noble.GameData.Bet == nil then
+		Noble.GameData.Bet = 1
+	end
 	Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE)
 end
 

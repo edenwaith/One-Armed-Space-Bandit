@@ -43,7 +43,7 @@ local instructionsText = "" -- Does this need to be a global var?
 function scene:init()
 	scene.super.init(self)
 	
-	instructionsText = "You're stranded at the Oasis Bar which has all the \nappealing odor of a Monolith Burger's bathroom.\n\nYour only hope is to earn 250 Buckazoids at the \nSlots-o-Death so you can buy a ship and get off \nthis crusty rock of a planet."
+	instructionsText = "You're stranded at the Oasis Bar which has all the \nappealing odor of a Monolith Burger's bathroom.\n\nYour only hope is to earn 250 Buckazoids at the \nSlots-o-Death so you can buy a ship and get off \nthis crusty sore of a planet."
 
 	scene.inputHandler = {
 		AButtonDown = function()

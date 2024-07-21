@@ -21,3 +21,16 @@ function Utilities.drawTextScaled(text, x, y, scale, font)
 	gfx.unlockFocus()
 	img:drawScaled(x - (scale * w) / 2, y - (scale * h) / 2, scale)
 end
+
+function dump(o)
+   if type(o) == 'table' then
+	  local s = '{ '
+	  for k,v in pairs(o) do
+		 if type(k) ~= 'number' then k = '"'..k..'"' end
+		 s = s .. '['..k..'] = ' .. dump(v) .. ','
+	  end
+	  return s .. '} '
+   else
+	  return tostring(o)
+   end
+end
