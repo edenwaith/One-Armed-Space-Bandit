@@ -385,6 +385,10 @@ function scene:exit()
 	first_slot_sprite:remove()
 	second_slot_sprite:remove()
 	third_slot_sprite:remove()
+	
+	if laserSoundTimer ~= nil then 
+		laserSoundTimer:remove()
+	end
 
 	Noble.Input.setCrankIndicatorStatus(false)
 	sequence = Sequence.new():from(100):to(240, 0.25, Ease.inSine)
@@ -397,9 +401,6 @@ function scene:finish()
 end
 
 function spin()
-	
-	-- TODO: Need to check if things are currently spinning, and if so
-	-- do not do anything here so it doesn't try to spin again
 		
 	if is_currently_spinning == true then 
 		return 
@@ -414,8 +415,8 @@ function spin()
 		is_currently_spinning = false 
 		spinMessage = "Sorry, you don't have enough to bet that much."
 	else
-	
-		roll = 1 -- math.random(1, 100)
+		-- FIXME: Temporary setting while just doing some testing
+		roll = math.random(1, 100)
 		local handicap = handicap()
 		
 		if (roll < 3) then  -- Death
@@ -604,7 +605,6 @@ function continueSpinning()
 		local winnings = 0
 		local frameTime = 200 -- Experimental value of 200ms per frame
 		
-		-- FIXME: Why is this checking the roll instead of the roll_status?!
 		if (roll < 3) then -- Death
 			Noble.GameData.Money = -1
 			spinMessage = "*You lose, homeboy!*"
@@ -615,11 +615,12 @@ function continueSpinning()
 			
 			setupFirstSlotAnimation()
 			setupSecondSlotAnimation() -- For this case, do not keep looping
-			-- setupLaserAnimation()
 			setupThirdSlotAnimation()
 			
-			-- Wait one second for the animation, then play the song
-			-- playLaserSound()
+			-- Play the lost sound, and the laser timer will start about a second later
+			playYouLostSound()
+			
+			-- setupLaserAnimation()
 			
 			-- Wait 1 second (1000ms) then play the laser sound to give enough time for the animation to complete
 			laserSoundTimer = playdate.timer 
@@ -849,7 +850,9 @@ end
 
 function playLaserSound()
 	
-	laserSoundTimer:remove()
+	if laserSoundTimer ~= nil then
+		laserSoundTimer:remove()
+	end
 	
 	local laserSound = snd.sequence.new('sounds/Sound28.mid')
 	local track1 = laserSound:getTrackAtIndex(1)
@@ -879,7 +882,10 @@ end
 
 function lostSoundFinished()
 	print("lostSoundFinished")
-	is_currently_spinning = false 
+	-- Except for the Death roll, reset is_currently_spinning
+	if roll_status ~= RollStatus.Death then
+		is_currently_spinning = false 
+	end
 end
 
 -- Death sound

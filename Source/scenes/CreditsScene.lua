@@ -1,7 +1,9 @@
 import "CoreLibs/timer"
+import "CoreLibs/graphics"
 
 CreditsScene = {}
 class("CreditsScene").extends(NobleScene)
+
 local scene = CreditsScene
 local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
@@ -9,20 +11,24 @@ local snd <const> = playdate.sound
 local version_num = playdate.metadata.version
 local synthPlayer = snd.synth.new(snd.kWaveSquare)
 -- local march_sound = snd.sequence.new('sounds/the_liberty_bell_march.mid') -- find a better version
-local liberty_bell = snd.fileplayer.new("sounds/Liberty_Bell/liberty_bell_march_louder")
+-- local liberty_bell = snd.fileplayer.new("sounds/Liberty_Bell/liberty_bell_march_louder")
+local liberty_bell = snd.fileplayer.new("sounds/Liberty_Bell/the_liberty_bell_march_longer")
 local splat = snd.fileplayer.new('sounds/splat')
 
 local footImage <const> = gfx.image.new('images/Foot.png')
+local preciousImage <const> = gfx.image.new('images/Precious.png')
 
 
 -- local default_font <const> = gfx.getSystemFont("normal") -- perhaps this will also work
 local sierra_font <const> = gfx.font.new('fonts/Sierra-AGI-Basic-Latin-and-Supplement')
 
 local text_y_delta = 50
+local precious_y_delta = 300 -- TODO: Calculate this later
 local foot_y_delta = -240
 -- Is it possible to read this in from a text file?
 local gippazoid_info = "*Slots-o-Death is another fine product by:*\nGippazoid Novelties\n2001 Odessa Blastway\nGurnville, Faydor\nExl Galaxy"
-local credits_text = "*ONE-ARMED SPACE BANDIT*\nVersion " .. version_num .. "\nCopyright © 2024 Edenwaith\nedenwaith.itch.io/one-armed-space-bandit\n\n*Design, programming, graphics, etc.*\nChad Armstrong\n\n*Original Game Concept*\nThe Two Guys From Andromeda\n\n*Beta Testers*\nMelissa Armstrong\nMikel Knight\nFester Blatz\n\n" .. gippazoid_info
+local precious_memoriam = "\n\n*Dedication*\nIn memory of Precious"
+local credits_text = "*ONE-ARMED SPACE BANDIT*\nVersion " .. version_num .. "\nCopyright © 2024 Edenwaith\nedenwaith.itch.io/one-armed-space-bandit\n\n*Design, programming, graphics, etc.*\nChad Armstrong\n\n*Original Game Concept*\nThe Two Guys From Andromeda\n\n*Music*\nThe Liberty Bell\nThe Stars and Stripes Forever\nby\nJohn Philips Sousa\n\n*Beta Testers*\nMelissa Armstrong\nMikel Knight\nFester Blatz\n\n" .. gippazoid_info .. precious_memoriam
 
 -- Timer variables
 local delayTimer
@@ -71,6 +77,16 @@ function scene:start()
 	scene.super.start(self)
 	
 	text_y_delta = 50 
+	-- TODO: Need to calculate where to place the preciousImage
+	
+	-- Calculate size of the credits_text
+	
+	local maxWidth = 240 -- self.maxWidth 
+	local textWidth, textHeight = gfx.getTextSizeForMaxWidth(credits_text, maxWidth)
+	
+	print("textWidth: " .. textWidth .. " textHeight: " .. textHeight)
+	
+	precious_y_delta = textHeight -- 500
 	foot_y_delta = -240
 	
 	playCredits = true 
@@ -97,10 +113,12 @@ function start_credits_roll()
 		return 
 	end 
 	
+	local liberty_bell_time = 33500 -- 16750 
 	print("text_y_delta start: " .. text_y_delta) -- Starts at 50 
-	textTimer = playdate.timer.new(16750, 0, 16750, function()
+	textTimer = playdate.timer.new(liberty_bell_time, 0, liberty_bell_time, function()
 		-- print("Current time: " .. playdate.getCurrentTimeMilliseconds())
 		text_y_delta -= 0.6
+		precious_y_delta -= 0.6
 		counter += 1
 	end)
 	textTimer.timerEndedCallback = credits_roll_finished 
@@ -117,17 +135,28 @@ function credits_roll_finished()
 
 	-- Animate the foot falling and squashing the credits 
 	
-	local total_y_delta = math.abs(text_y_delta) + 240
-	local timer_ms = 600
-	local incrementer_delta = total_y_delta / 30 / (timer_ms/1000) 
-	print("total_y_delta: " .. total_y_delta .. " incrementer_delta: " .. incrementer_delta)
+	local precWidth, precHeight = preciousImage:getSize()
+	print("precWidth: " .. precWidth .. " precHeight: " .. precHeight)
 	
+	-- 56 is extra padding so the foot comes down far enough
+	local total_y_delta = math.abs(text_y_delta) + precHeight + 240 + 56 -- TODO: Add height of image
+	local timer_ms = 600
+	local incrementer_delta = total_y_delta / 30 / (timer_ms/1000) -- perhaps add the height of the image, as well?
 	local foot_incrementer_delta = (math.abs(foot_y_delta) + 240) / 30 / (timer_ms/1000)
+	
+	print("foot_y_delta: " .. foot_y_delta .. " foot_incrementer_delta: " .. foot_incrementer_delta)
+	print("total_y_delta: " .. total_y_delta .. " incrementer_delta: " .. incrementer_delta .. " foot_incrementer_delta: " .. foot_incrementer_delta)
+	
 	
 	footTimer = playdate.timer.new(timer_ms, 0, timer_ms, function()
 		text_y_delta += incrementer_delta -- 28
+		precious_y_delta += incrementer_delta
 		if text_y_delta >= 0 then
+			-- Is this not moving when it should?
 			foot_y_delta += foot_incrementer_delta
+			print("footTimer -- foot_y_delta is " .. foot_y_delta)
+		else 
+			print("footTimer -- text_y_delta is " .. text_y_delta)
 		end 
 	end)
 	footTimer.timerEndedCallback = foot_animation_completed
@@ -152,6 +181,7 @@ function foot_animation_completed()
 	playdate.timer.performAfterDelay(500, function() 
 		-- Ensure that text_y_delta is 240 in case of any rounding errors
 		text_y_delta = 240
+		precious_y_delta = 680 -- TODO: calculate this value
 		
 		textTimer = playdate.timer.new(2000, 0, 2000, function()
 			-- print("Current time: " .. playdate.getCurrentTimeMilliseconds())
@@ -224,9 +254,13 @@ function scene:update()
 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillBlack)
 	Noble.Text.draw(credits_text, 200, text_y_delta, Noble.Text.ALIGN_CENTER)
 	
+	assert(preciousImage)
+	gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+	preciousImage:draw(119, precious_y_delta) -- 200 - (162/2)
+	
 	assert(footImage)
 
-	gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+	-- gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
 	footImage:draw(75, foot_y_delta) -- image is shifted to the left so the foot and leg look more centered
 	
 	-- This looks correct right now, but something broke things and so the D-pad glyphs would be all black

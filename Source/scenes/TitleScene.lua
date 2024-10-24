@@ -43,7 +43,7 @@ function scene:init()
 	
 	
 	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
-	menu:addItem("Sounds", transitionToSoundsScene)
+	-- menu:addItem("Sounds", transitionToSoundsScene)
 	-- menu:addItem("High Scores", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 
 -- 	menu:addItem(Noble.TransitionType.DIP_METRO_NEXUS, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)

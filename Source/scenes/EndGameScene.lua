@@ -57,7 +57,7 @@ function scene:enter()
 		end_song = snd.sequence.new('sounds/Sound25-LSL.mid')
 	elseif (gameStatus == GameStatus.Won) then
 		end_game_title = "YOU WON!"
-		end_game_message = "You collect your newly earned \nfilthy lucre and head off to \nTiny's Used Space Ship Lot. \nNow it's time to blow this \ntaco stand!"
+		end_game_message = "You collect your newly earned \nfilthy lucre and head off to \nTiny's Used Space Ship Lot. \n\nNow it's time to blow this \ntaco stand!"
 		end_image = gfx.image.new('images/Buckazoidsq1')
 		end_song = snd.sequence.new('sounds/Sound24-Square.mid')
 	else

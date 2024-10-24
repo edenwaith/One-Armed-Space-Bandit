@@ -153,3 +153,33 @@ Working on the laser table images.  This will require a decent amount of work to
 16 July 2024:
 Shortened the YouLost-Shorter.mp3 file to clip off the empty space at the start of the sound clip.  Made YouLost-Even-Shorter.mp3, and trimmed off another KB from the previous song.  Adjusted the laser-table images so they are 190px in height so I don't have to adjust the position of the second slot sprite, since the moveTo() function sets a sprite by its center, not a corner.
 
+20 July 2024:
+Worked primarily on the laser animation.  Had to resize the laser gun twice.  I initially made it 54 pixels wide, but that didn't leave any space for the sides, so I clipped it slightly down to 52 pixels wide, but then increased the height to 86px to take up the entire slot space (with the 1px border).  The laser shot which I had already developed for the larger image had to be resized and then dithered again.  My OneBithOrderedDither plug-in has been immensely useful for creating these graphics.  For the laser beam, none of the error dither methods looked good.
+
+I also figured out why the death screen music had a hiccup.  I noticed in the console it was reporting the volume being set twice, the second time happening right about when the hiccup happens.  I was calling the playDeathSound() method twice!  I probably would have come across that when cleaning up the code, but glad I figured out that glitch finally (even though I wasn't hearing it on the actual Playdate).
+
+23 July 2024:
+Created 32x32 icons for the skull and cherry, and touched up the existing eye and diamond.  Finished creating the wrapping paper pattern and tested it in the simulator.  Looks pretty decent.
+
+28 July 2024:
+Fixed the wrapping pattern, the alignment was a bit off for a bunch of the columns.
+
+31 July 2024:
+Started theming the itch.io product page.  BG is #fec832, BG2 is #525252, and text and links are #ffffff.  Created an image of Precious.
+
+21 September 2024:
+Been very busy with other things, especially assisting with getting Steam achievements working for The Crimson Diamond and preparing Mac ports for the game.  I did manage to build a universal binary of libagsteam-unified.dylib which should be immensely useful for AGS games running on Apple Silicon Macs.
+
+I removed the "Sounds" option from the title screen.  I should probably do a commit and then start cleaning up a bunch of cruft (or copying the old stuff into another folder).  I made some updates to the Credits screen to attribute the music.  I'll need to use a longer version of The Liberty Bell March to properly display the credits, in addition to the memorium to Precious.
+
+19 October 2024:
+After finishing up the two lengthy blog posts about integrating Steam and AGS games for Mac, I'm ready to get back to working on this glorious Playdate game.  Robotspacer is also streaming PD development of his game Transfer Point.  Fixed a crash when testing immediate loss or win from the game scene.  Added a new line in the win text on the EndGameScene.  The next big task I probably need to do is make a longer credits music track and then extend the credits.
+- Use an extended version of The Liberty Bell song.  Then make it louder.
+- Adjust how long to set the timer with the longer music.
+- Calculate size of the credits text.
+- Properly position Precious's image
+- The foot image is not coming down as far as needed.
+- Precious's image is not properly positioned on subsequent credit rolls.
+
+22 October 2024:
+I resaved the the_liberty_bell_march_longer.wav in Audacity as a WAV (Microsoft) with the IMA ADPCM encoding, which shrunk the audio file from 6.3 MB to a more manageable 1.6 MB.  Still, I'd love this to be a MIDI file, where the original MIDI file was a svelte 28 KB.  Now playing the "you lost sound" on getting three skulls, just as the laser starts coming out and then plays the laser sound.  Fixed a new bug when playing the "you lost" sound, the A button can be pressed, which displays the "you don't have enough money" message.  Things feel like they are getting close to wrapping up, so it will soon be time to start cleaning things up.

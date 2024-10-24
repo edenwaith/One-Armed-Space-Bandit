@@ -1,15 +1,15 @@
 TODO:
 
-+ Instructions Sceen
++ Instructions Screen
 	+ The Story So Far screen
 	+ How to use/Directions (raise, lower bet, how to spin)
 	+ Betting odds (diamonds, eyes, cherries, skulls)
 	
-- Game Scene
++ Game Scene
 	+ Finish flushing out the background graphics
 	+ Animations after a win
-	- Display the laser and shoot the player (with sound)
-		- Get these image assets and create B&W versions
+	+ Display the laser and shoot the player (with sound)
+		+ Get these image assets and create B&W versions
 	+ Fix the sound balance of the "lost spin" sound.  Or lower the other sounds.
 	+ Do not allow multiple sounds to play at the same time (win sound and then trying to spin again).
 	
@@ -32,7 +32,7 @@ TODO:
 	+ Finish designing the foot
 	+ Squash the credits 
 	/ Add a QR Code and/or URL at the end?
-	- Add a dedication and dithered image of Precious at the bottom.  Probably will need to increase the length of the song.
+	+ Add a dedication and dithered image of Precious at the bottom.  Probably will need to increase the length of the song.
 	- Thanks (Panic, podcasts, Uncrank'd zine, PD community)
 
 - General 
@@ -42,7 +42,7 @@ TODO:
 	+ Restore game state when returning (be able to continue game, returning to the Main Menu might be fine.)
 	/ Normalize sound effects across the entire game.  A lot of the MIDIs, in particular, are quite loud.  WAV files tend to be softer.
 		- Bump up the volume of the Liberty Bell March (20% or so).
-	- Create wrapping paper design
+	+ Create wrapping paper design
 	- When the Home menu is displayed and have the custom screen, perhaps show the controls like what Icy Dungeon displays?
 
 - Bugs
@@ -54,6 +54,7 @@ TODO:
 	+ The You Lost sound has a bit of empty space before it plays, perhaps trim some of that off, as well.
 	+ Bump up the sound of the You Lost sound (sound27.mp3) a bit.  20% perhaps?  Ended up bumping twice by about 10dB.
 	/ After losing all of your money, play the final "lost" sound, then move to the end scene.
+	+ After getting three skulls, play the "lost sound", then animate the laser gun showing.
 	
 - Other
 	- Is it possible to enter a Konami-type code to cheat?
@@ -62,13 +63,26 @@ TODO:
 	
 - Marketing
 	- Websites
-		- Itch.io
+		/ Itch.io
 			- Instructions how to play w/o a Playdate?
 		- Edenwaith
 	- Get the word out
 		- Discord channels
 		- Reddit
+		- Playdate Dev site for announcement
 		- Social media
-		- Uncrank'd zine
+			- Facebook (Sierra-related groups)
+			- Mastodon 
+			- Twitter
+		- Uncrank'd zine / Xania
+		- E-mail
+			- Destination Playdate 
+			- Xania 
+			- The Unofficial Playdate podcast (the one with Don, Nick, etc.)
+			- Friday Night Arcade
+			- 8-Bit Guy 
+			- SpaceQuestHistorian
+			- Serenity Forge (Z and Kevin)
+			- Matt Aukamp (from the Save Your Game podcast)
 	- Share & Enjoy
-		- Send copies or share details with Space Quest and Playdate fans
+		- Send copies or share details with Space Quest and Playdate fans (and also Serenity Forge)
