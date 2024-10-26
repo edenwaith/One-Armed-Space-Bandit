@@ -183,3 +183,15 @@ After finishing up the two lengthy blog posts about integrating Steam and AGS ga
 
 22 October 2024:
 I resaved the the_liberty_bell_march_longer.wav in Audacity as a WAV (Microsoft) with the IMA ADPCM encoding, which shrunk the audio file from 6.3 MB to a more manageable 1.6 MB.  Still, I'd love this to be a MIDI file, where the original MIDI file was a svelte 28 KB.  Now playing the "you lost sound" on getting three skulls, just as the laser starts coming out and then plays the laser sound.  Fixed a new bug when playing the "you lost" sound, the A button can be pressed, which displays the "you don't have enough money" message.  Things feel like they are getting close to wrapping up, so it will soon be time to start cleaning things up.
+
+23 October 2024:
+Started working on the clean up process.  Made it through several Lua files.
+
+24 October 2024:
+Cleaned up the InstructionsScene and a bit of TitleScene and CreditsScene.
+
+25 October 2024:
+Cleaning up the largest scene: GameScene.  Got through about 3/4 of that file.
+
+26 October 2024:
+Finished cleaning up the GameScene (probably cut out at least 100 lines of cruft).  Also cleaned up main.lua.  Next step will be doing a backup of the project and then start removing all of the old files and libraries, which should greatly reduce the size of the project.
