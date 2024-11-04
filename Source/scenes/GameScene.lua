@@ -55,10 +55,7 @@ local thirdSlotAnimationLoop
 
 -- Sound variables
 local synthPlayer = snd.synth.new(snd.kWaveSquare)
--- TODO: Some of these blips need to be removed
 local blipSound = snd.sequence.new('sounds/sound25.mid')
-local blipMP3Player = snd.fileplayer.new("sounds/Sound25")
-local blipWAVPlayer = snd.sampleplayer.new("sounds/Sound25.wav")
 
 local laserSoundTimer
 
@@ -603,7 +600,6 @@ function playBlipSound()
 end
 
 function playBlipSoundMIDI()
-	-- stopAllSounds()
 	
 	local track1 = blipSound:getTrackAtIndex(1) -- May have to start at #2, experiment
 	local track2 = blipSound:getTrackAtIndex(2)
@@ -664,7 +660,7 @@ end
 function playYouLostSound()
 	local mp3Player = snd.fileplayer.new("sounds/YouLost-Even-Shorter")
 	mp3Player:setFinishCallback(lostSoundFinished)
-	mp3Player:play() -- How to set a callback when finished?
+	mp3Player:play()
 end
 
 function playLaserSound()

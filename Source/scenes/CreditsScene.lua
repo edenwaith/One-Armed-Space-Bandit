@@ -11,7 +11,7 @@ local snd <const> = playdate.sound
 local version_num = playdate.metadata.version
 local synthPlayer = snd.synth.new(snd.kWaveSquare)
 
-local liberty_bell = snd.fileplayer.new("sounds/Liberty_Bell/the_liberty_bell_march_longer")
+local liberty_bell = snd.fileplayer.new("sounds/the_liberty_bell_march_longer")
 local splat = snd.fileplayer.new('sounds/splat')
 
 local footImage <const> = gfx.image.new('images/Foot.png')

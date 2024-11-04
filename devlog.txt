@@ -194,4 +194,7 @@ Cleaned up the InstructionsScene and a bit of TitleScene and CreditsScene.
 Cleaning up the largest scene: GameScene.  Got through about 3/4 of that file.
 
 26 October 2024:
-Finished cleaning up the GameScene (probably cut out at least 100 lines of cruft).  Also cleaned up main.lua.  Next step will be doing a backup of the project and then start removing all of the old files and libraries, which should greatly reduce the size of the project.
+Finished cleaning up the GameScene (probably cut out at least 100 lines of cruft).  Also cleaned up main.lua.  Next step will be doing a backup of the project and then start removing all of the old files and libraries, which should greatly reduce the size of the project.  Backed up the project (pre-clean-up) to a folder named "One-Armed Space Bandit Pre Clean-up", so I can go back and reference any of the old code and files.  Started moving the old source files into a folder named Old.
+
+27 October 2024:
+Doing a little more code clean up and removing old files.  Also need to remove any imports, otherwise it won't compile.

@@ -9,12 +9,9 @@ import 'libraries/noble/Noble'
 import 'utilities/Utilities'
 
 import 'scenes/EndGameScene'
-import 'scenes/ExampleScene'
-import 'scenes/ExampleScene2'
 import 'scenes/TitleScene'
 import 'scenes/InstructionsScene'
 import 'scenes/GameScene'
-import 'scenes/SoundsScene'
 import 'scenes/CreditsScene'
 
 
@@ -99,14 +96,6 @@ function loadGameData()
         print("tempSaveData was nil")
     end
     
---     print("Number of save games: " .. numSaveGames)
---     if currentSlotNum ~= nil then
---         print("Current Slot #: " .. currentSlotNum)
---     end
---      
---     -- if numSaveGames > 0 then
---     --     local gameData = Noble.GameData.getG
---     -- end
 end
 
 loadGameData()

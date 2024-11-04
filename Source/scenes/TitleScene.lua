@@ -17,7 +17,6 @@ function scene:init()
 	menu:addItem("New Game", transitionNewGame)
 	
 	if Noble.GameData.Status == GameStatus.Playing then
-		-- TODO: Need to create some new method or ensure that certain status and variables are set properly
 		menu:addItem("Continue Game",  function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 		menu:select("Continue Game")
 	end
