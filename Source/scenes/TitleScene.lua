@@ -70,10 +70,6 @@ function transitionNewGame()
 	Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE)
 end
 
-function transitionToSoundsScene()
-	Noble.transition(SoundsScene, 1, Noble.TransitionType.DIP_TO_BLACK)
-end
-
 function scene:enter()
 	scene.super.enter(self)
 end
@@ -91,6 +87,7 @@ function scene:drawBackground()
 	  -- Set the background image
 	assert( backgroundImage )
 	-- Background image adjusted by one pixel to display white line on the right 
+	gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
 	backgroundImage:draw( -1, 0 )
 end
 
@@ -100,17 +97,14 @@ function scene:update()
  	gfx.setColor(Graphics.kColorBlack)
  	gfx.fillRect(240, 0, 160, 240)
  	menu:draw(250, 20)
-
-	-- Graphics.setColor(Graphics.kColorWhite)
-	
+	 
 	-- When this fill is set, it then draw the background as white, which hides the background image		
-	-- gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-	-- local version_num = "v" .. playdate.metadata.version 
-	-- Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+	gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+	local version_num = "v" .. playdate.metadata.version 
+	Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
 	-- 
 	-- -- This is then set so the background image is visible 
-	-- Unfortunately, when leaving the Game Scene, it causes weirdness here. :( )
-	-- gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+	gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
 
 end
 

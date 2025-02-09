@@ -13,6 +13,7 @@ import 'scenes/TitleScene'
 import 'scenes/InstructionsScene'
 import 'scenes/GameScene'
 import 'scenes/CreditsScene'
+import 'scenes/TemplateScene'
 
 
 GameStatus = {
@@ -103,6 +104,6 @@ loadGameData()
 Noble.showFPS = false
 
 -- Load in the TitleScene
-Noble.new(TitleScene, 1.5, Noble.TransitionType.CROSS_DISSOLVE)
+Noble.new(TitleScene, 1.5, Noble.TransitionType.DIP_TO_BLACK)
 
 
