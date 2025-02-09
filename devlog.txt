@@ -1,0 +1,200 @@
+18 May 2024:
+Considering my past habits of writing a devlog (especially short snippets which now would be ideal for microblogging), I'm amazed I haven't started this log until today to help record my journey of developing my first Playdate game, including any progress and issues I encounter, in addition to the blog entry I've slowly been building up, which I'll likely release around the time of One-Armed Space Bandit's release.
+
+Yesterday I made some good progress on the End Scene by creating some images for the Death and Won scenarios, and also developed a button in the style of an SCI0 game.
+
+I once again tried to display the version number on the Title Scene, but when I exit the Game Scene, it shows graphical issues where the old scene becomes somewhat transparent and looks very odd during the transition.  Here is the code I tried where the text is set to white and then the drawing mode is changed afterwards.
+
+-- When this fill is set, it then draw the background as white, which hides the background image		
+gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+local version_num = "v" .. playdate.metadata.version 
+Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+ 
+-- This is then set so the background image is visible 
+-- Unfortunately, when leaving the Game Scene, it causes weirdness here. :( )
+gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+
+I think my next steps are to either return to the Credits or Instructions scenes.  For the Credits screen, I might want the text to scroll before being smashed by the foot.  Also need to find an appropriate MIDI version of the Liberty Bell March to play.  Once that is in place, I think that scene will be complete.
+
+The Instructions scene still needs a lot of additional content, but I think once I flush out the rules and directions, it should be in a good state.
+
+I keep finding a lot of small issues and such.  Even on Easy mode, the game has been too difficult.  I then looked at how I was calculating the handicap and I noticed a major issue with my math (perhaps a remnant from some older code) and fixed that so the game shouldn't be quite so brutally difficult.
+
+The basic game logic is pretty solid, so playing the game is in place, and this product is starting to congeal and look like something!  Still plenty of parts missing, and then the necessary polish, but definitely some good progress.
+
+When I was trying to figure out how to print the specific Playdate icons/glyphs to indicate things like the buttons, D-pad directions, crank, etc., this took some time to figure out.  An older version of the Designing For Playdate documentation (v. 1.9.x) showed the appropriate icons of 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️ (plus the Ⓐ and Ⓑ buttons), but newer versions of the documentation excluded this info.  But when I tried to print these glyphs (just drawn like text), they appeared entirely black.  To fix this, I had to set the image draw mode to gfx.kDrawModeWhiteTransparent to make these glyphs appear correctly.
+
+-- Reminder: Need to set the image draw mode to gfx.kDrawModeWhiteTransparent for the PD icons to appear correctly.
+gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+Noble.Text.draw("Emoji _Glyphs!_ 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️", 200, 20, Noble.Text.ALIGN_CENTER)
+
+Today I flushed out more of the Instructions scene, I can move between three screens worth of content.  I worked some on one of the images (skulls, eyes, dimaonds).
+
+I noticed when I added the snd 191.aiff sound file into the sounds folder, the game stopped building.  Once I removed it, the game built properly again.
+
+On the credits screen, I want the text to scroll up.  (Side note, perhaps I should add credits to any beta testers.)  I should also look in to some method of reading in the credits from a text file.  I'm currently scrolling by running a timer and having a delta offset move the text.  I want to play The Liberty Bell March and once it completes, then have a foot squash the credits down.  SPLAT!
+
+
+19 May 2024:
+Converted the splat.aiff file to .wav using Audacity.  I looked around at other solutions, such as QuickTime Player, VLC, or Music, but Audacity was the most straightforward solution for what I was trying to do.  
+
+According to the Inside Playdate documentation (https://sdk.play.date/2.4.2/Inside%20Playdate.html#M-sound), export the .aiff file to .wav:
+
+File > Export Audio… > File type: WAV (Microsoft), Encoding: IMA ADPCM.
+
+This also had the bonus of reducing the file size from 5,994 bytes to 3,192 bytes, almost halving the file size.
+
+Figured out why the audio wasn't stopping when leaving the EndGameScene.  The method stopAllSounds() was being called, however this was calling the method in another file!  This is something quite nefarious and annoying with Lua.  Changed the method name to stopAllEndSceneSounds() and made the necessary changes within EndGameScene.lua.  Is there a better way to ensure that certain methods retain scope to their file?
+
+Performed some optimizations with the End Scene so it isn't loading up all possible songs or addiitional images, just have a single image or audio file and then set the appropriate asset as the scene initializes.
+
+
+28 May 2024:
+Lowered the "blip" sound so it isn't nearly as loud, even when the Playdate is on its lowest sound level.  This is now more in line with the volume of the "you lost" sound.
+
+Mostly worked on the Instructions screen, additional content, some new layout, modified how the A/B buttons are displayed at the bottom of the screen now.
+
+
+29 May 2024:
+On the Instructions screen(s), added a rounded border for the body content portion.  All three screens/pages now have a dark footer with the button text.  I might change the End Scene's button to be similar in style (even if I do like the Sierra-style SCI button.
+
+
+31 May 2024:
+Worked on the Instructions scene, which is now in a really good state.  Researched GridView (https://sdk.play.date/2.5.0/Inside%20Playdate.html#_grid_view_sample_code) to see if that would be something useful for the Bettings screen, but ended up just laying out the content and drew borders.  But the GridView would be useful for a menu system, I should look more into that.  Also made some other smaller adjustments on the first two pages on the spacing of the text and some layout.
+
+
+1 June 2024:
+Returning to the Credits page, cleaned up several dozen lines of old code to get the file under 200 lines.  To trim the MIDI file the_liberty_bell_march.mid to cut off the start and a bunch of the end, first needed to use Garageband to trim the track (couldn't figure out how to perform a simple trim in Logic Pro), but then saved it out as a Garageband project, then opened it in Logic Pro X so I could then export the file as MIDI (Garageband wouldn't export a song as MIDI, only things like MP3, AAC, AIFF, WAV.  Added this march song and modified the timer to stop running after ~17 seconds (the length of the sound clip) and then play the splat sound afterwards.
+
+
+2 June 2024:
+Playing around with the animation of the scrolling credits and trying to get the timing right along with the sounds.
+
+
+3 June 2024:
+Added the foot image to the credits.  Took a bit of figuring out why the foot wasn't animating at the proper speed as the text, but eventually realized the text was up higher, so had to delay the foot animation until the text caught up.  Starting to look good!  Still need to play around with this a bit more to get everything workingly smoothly, but the basic concept is in the place.  Also have the animation sequence going in rotation now.  SPLAT!
+
+
+4 June 2024:
+When I was testing out my recent work for the Credits screen, I did encounter a couple of issues.  If one leaves the screen and returns, the text was still in the original position.  There were also times that the music kept playing, so it seems like the timers weren't being cleared out, or perhaps after it repeats the old timers were not being deallocated.  Made a couple of fixes, when the scene finishes, reset the delta Y position for the text and foot image, and also reset those values in the enter() method.  Also made sure that after any timer expired to call the remove() method.  Hopefully this fixes the weird issues, otherwise I'll just have the credits scroll once, and then after that, let the user manually scroll through the credits.  I might even want to double the length of the intro song if it seems like the credits scroll too quickly.  I'll need to time other variants such as the Monty Python intro and Disinfectant's about screen.  Right now, the tune I have playing is about 16.5 seconds long.  The delay timers are still causing some bugs where if I leave the Credits scene, the music does keep playing.  Weird.  Ended up adding a bool check to gatekeep whether these should play or not.  Kind of a hacky fix.
+
+Created the skeleton framework for the itch.io page for the game.  The URL is https://edenwaith.itch.io/one-armed-space-bandit .  Added this URL to the credits.  Might still create a QR code.
+
+
+5 June 2024:
+Found a free stock image of a  broke piggy bank for the End Scene.  Flushed out more of the text, including several different messages for the Death Scene.  Also made a minor update to the Instructions page.  Adjusted the music to be at 20% of the original volume, this seems a lot better when played at the lowest level on the Playdate.
+
+6 or 7 June 2024:
+Researching how to save the user's state and doing some preliminary work in checking when the app closes vs. opens and what the Noble.GameData can handle.
+
+8 June 2024:
+Small tweak to one of the death messages.  Trying to get the Noble.GameData to save and restore properly.  Added the Money property and modified the GameScene to use Noble.GameData.Money instead of the local money variable. But trying to save this value to disk and restore it doesn't seem to work as expected.  Might just handle this manually via how the Playdate documentation recommends via https://sdk.play.date/2.5.0/Inside%20Playdate.html#saving-state .
+
+9 June 2024:
+Still wrestling with the GameData and trying to save and load the data.  The Bet value kept on being nil for some unknown reason.  Changed the local currentBet variable in the Game scene to make use of the Noble.GameData.Bet, instead.  Probably will just manually save the data using's Playdate's APIs and not the Noble engine's approach.  Fortunately, there are only a few pieces of data to read in.
+
+11 June 2024:
+Stopped bashing my head against the wall in trying to get the Noble.GameData to save and load properly, making use of the playdate.datastore, instead, and that seems to work a lot better.
+
+12 June 2024:
+Getting the loading and saving working by working wwith the playdate.datastore.  Works well in the simulator, but it caused my Playdate to crash when I installed it.  The game crashed when trying to go to the game, something about the Bet value.
+
+scenes/GameScene.lua:273: attempt to concatenate a nil value (field 'Bet')
+stack traceback:
+    scenes/GameScene.lua:273: in method 'update'
+echo off
+target=dvt1
+build=216ce27b-2.5.0-release.169289-buildbot-240523
+boot_build=216ce27b-2.5.0-release.169289-buildbot
+SDK=2.5.0
+pdxversion=20500
+serial#=PDU1-Y005573
+cc=9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]
+pcbver=0x01
+time and date set
+
+Easily fixed this crash by ensuring that there is a valid Bet value before starting a new game.
+
+13/14 June 2024:
+Fixed the issue in the Game Scene where multiple sounds might be playing at the same time.  I also encountered an issue when Sound26 was playing, it was actually calling the method from the Sound Scene, not the same-named method in the Game Scene.  I still need to find a fix for this issue, something with the Noble engine, or is it just Lua?
+
+15 June 2024:
+Updated the You Lost sound so it is a little louder (~10dB) and cut off part of the end, which made it feel like that the sound was too long.  The start of the sound also has a bit of emptiness, so I might trim off some of that, as well.  Read up on animations and image tables.  Made an ordered dither version of the glowing diamond.  I noticed that some of the originals are 56px in width, but some of my black & white images are 54px wide, I probably clipped the canvas on those images.  I might need to make these small edits to any new images for the animated images.
+
+16 June 2024:
+Creating the images to use for animations and image tables.  Each of the images which are created have a format like <image name>-table-<sequence number>.png (e.g. cherries-table-1.png).  I tried to create the animation loops and place them into the game, but I never saw anything appear.  I might just try loading up the image tables into the existing sprites, instead.
+
+18 June 2024:
+Trimmed off a bit to the start of the You Lost sound.  Bumped up the sound to the Liberty Bell March wave file.  May not be quite loud enough for my tastes, but I'm trying.  Also creating the diamondsImageTable.  Got an initial animation loop to work in a sprite, but the animated sprite doesn't clear out, so I'll need to reset something when spinning again, perhaps remove the sprite and readd it.
+
+19 June 2024:
+Got the animations working for cherries and diamonds.  Just needed to null out the update method on the sprite to clear it out when rolling again.  Need to work on the eyes and skulls animations now.  When continuing the game, it keeps the old slot images, this was a pretty easy and quick fix.
+
+26 June 2024:
+I had noticed I was seeing a lot of cases with 3 Diamonds, but very few cases of 3 Eyes.  The issue was due to the addition of the handicap for the easier modes, where 3 Diamonds could easily appear far more than 3 Eyes, which was still only two point difference above 3 Diamonds.  I halved the handicap for 3 Diamonds, so 3 Diamonds should not appear as often, but 3 Eyes can appear more often.  This change should balance out the game play for the easier modes.
+
+2 July 2024:
+Starting work on the Wrapping Paper image (wrapping-pattern.png) and testing it in the Simulator.  Also trying to test out the content warning phrase.
+
+6 July 2024:
+Worked on the background graphics for the game scene.  Added some dots to the border and then beveled the white rectangles and added some drop shadow.  I tried some dithered patterns for light and dark grey, but they didn't look very good.  All of this new art was done by hand, no filters used.
+
+7 July 2024:
+When working on the Slots-Background image yesterday, I accidentally hid the Black Square layer, which is necessary.  Oops.  Added that back in.  Added a little extra shading for Bevel Shading - Left layer so that the left rectangle stands out a bit more.  The other two rectangles already look good, but that is based upon where they laid on the background, so it already looks like there is one extra column of shadow.
+
+11 July 2024:
+Working on the laser image.  Needed to stretch out the laser shot so it is long enough for the Playdate screen.  The ordered dither pattern for the laser looks pretty good, but error dithering looks awful.  The laser canon (cannon?) looks good either way.
+
+Took a look at the current size of this game as reported by Playdate, and it currently comes in at 3.4MB, not quite as large as I thought, but I bet a bunch of that is from extra images and sound files which just need to be removed.  Getting this game under 2MB is a good goal.
+
+12 July 2024:
+Working on the laser table images.  This will require a decent amount of work to get the images to fit into the slot, but I'm working out the basic idea.  The laser itself looks pretty decent.  Also encountered an obscure bug if I leave the simulator just as the laser is shooting, then restart the game in Nova, it thought the game was still going, even though the player has -1 Buckazoids.
+
+16 July 2024:
+Shortened the YouLost-Shorter.mp3 file to clip off the empty space at the start of the sound clip.  Made YouLost-Even-Shorter.mp3, and trimmed off another KB from the previous song.  Adjusted the laser-table images so they are 190px in height so I don't have to adjust the position of the second slot sprite, since the moveTo() function sets a sprite by its center, not a corner.
+
+20 July 2024:
+Worked primarily on the laser animation.  Had to resize the laser gun twice.  I initially made it 54 pixels wide, but that didn't leave any space for the sides, so I clipped it slightly down to 52 pixels wide, but then increased the height to 86px to take up the entire slot space (with the 1px border).  The laser shot which I had already developed for the larger image had to be resized and then dithered again.  My OneBithOrderedDither plug-in has been immensely useful for creating these graphics.  For the laser beam, none of the error dither methods looked good.
+
+I also figured out why the death screen music had a hiccup.  I noticed in the console it was reporting the volume being set twice, the second time happening right about when the hiccup happens.  I was calling the playDeathSound() method twice!  I probably would have come across that when cleaning up the code, but glad I figured out that glitch finally (even though I wasn't hearing it on the actual Playdate).
+
+23 July 2024:
+Created 32x32 icons for the skull and cherry, and touched up the existing eye and diamond.  Finished creating the wrapping paper pattern and tested it in the simulator.  Looks pretty decent.
+
+28 July 2024:
+Fixed the wrapping pattern, the alignment was a bit off for a bunch of the columns.
+
+31 July 2024:
+Started theming the itch.io product page.  BG is #fec832, BG2 is #525252, and text and links are #ffffff.  Created an image of Precious.
+
+21 September 2024:
+Been very busy with other things, especially assisting with getting Steam achievements working for The Crimson Diamond and preparing Mac ports for the game.  I did manage to build a universal binary of libagsteam-unified.dylib which should be immensely useful for AGS games running on Apple Silicon Macs.
+
+I removed the "Sounds" option from the title screen.  I should probably do a commit and then start cleaning up a bunch of cruft (or copying the old stuff into another folder).  I made some updates to the Credits screen to attribute the music.  I'll need to use a longer version of The Liberty Bell March to properly display the credits, in addition to the memorium to Precious.
+
+19 October 2024:
+After finishing up the two lengthy blog posts about integrating Steam and AGS games for Mac, I'm ready to get back to working on this glorious Playdate game.  Robotspacer is also streaming PD development of his game Transfer Point.  Fixed a crash when testing immediate loss or win from the game scene.  Added a new line in the win text on the EndGameScene.  The next big task I probably need to do is make a longer credits music track and then extend the credits.
+- Use an extended version of The Liberty Bell song.  Then make it louder.
+- Adjust how long to set the timer with the longer music.
+- Calculate size of the credits text.
+- Properly position Precious's image
+- The foot image is not coming down as far as needed.
+- Precious's image is not properly positioned on subsequent credit rolls.
+
+22 October 2024:
+I resaved the the_liberty_bell_march_longer.wav in Audacity as a WAV (Microsoft) with the IMA ADPCM encoding, which shrunk the audio file from 6.3 MB to a more manageable 1.6 MB.  Still, I'd love this to be a MIDI file, where the original MIDI file was a svelte 28 KB.  Now playing the "you lost sound" on getting three skulls, just as the laser starts coming out and then plays the laser sound.  Fixed a new bug when playing the "you lost" sound, the A button can be pressed, which displays the "you don't have enough money" message.  Things feel like they are getting close to wrapping up, so it will soon be time to start cleaning things up.
+
+23 October 2024:
+Started working on the clean up process.  Made it through several Lua files.
+
+24 October 2024:
+Cleaned up the InstructionsScene and a bit of TitleScene and CreditsScene.
+
+25 October 2024:
+Cleaning up the largest scene: GameScene.  Got through about 3/4 of that file.
+
+26 October 2024:
+Finished cleaning up the GameScene (probably cut out at least 100 lines of cruft).  Also cleaned up main.lua.  Next step will be doing a backup of the project and then start removing all of the old files and libraries, which should greatly reduce the size of the project.  Backed up the project (pre-clean-up) to a folder named "One-Armed Space Bandit Pre Clean-up", so I can go back and reference any of the old code and files.  Started moving the old source files into a folder named Old.
+
+27 October 2024:
+Doing a little more code clean up and removing old files.  Also need to remove any imports, otherwise it won't compile.

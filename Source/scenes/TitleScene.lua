@@ -4,51 +4,25 @@ local scene = TitleScene
 
 local gfx <const> = playdate.graphics
 
-scene.baseColor = Graphics.kColorWhite
-
--- local background
--- local logo
+local backgroundImage = gfx.image.new( "images/Title-Scene" ) 
 local menu
-local sequence
-
 local difficultyValues = {"Easy", "Medium", "Hard"}
 
 function scene:init()
 	scene.super.init(self)
 
-	-- background = Graphics.image.new("assets/images/background1")
-	-- logo = Graphics.image.new("libraries/noble/assets/images/NobleRobotLogo")
+	-- Docs for Noble.Menu: https://noblerobot.github.io/NobleEngine/modules/Noble.Menu.html
+	menu = Noble.Menu.new(true, Noble.Text.ALIGN_LEFT, false, Graphics.kColorWhite, 8,8,0, Noble.Text.FONT_MEDIUM, 8, 0)
 
-	menu = Noble.Menu.new(true, Noble.Text.ALIGN_LEFT, false, Graphics.kColorWhite, 4,6,0, Noble.Text.FONT_MEDIUM)
-
-
--- 	menu:addItem(Noble.TransitionType.DIP_TO_BLACK, function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
-
-	-- TODO: Need to do some more checks, ensure that the game status has been updated, reset money, etc.
-	-- menu:addItem("New Game", function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
 	menu:addItem("New Game", transitionNewGame)
---	menu:addItem(Noble.TransitionType.DIP_TO_WHITE, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_WHITE) end)
-	-- This one seems like an optional menu item, depending if a game was being played, or just maintain 
-	-- the current game state and return to the in-progress game
-	-- menu:addItem("Continue Game", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
 	
 	if Noble.GameData.Status == GameStatus.Playing then
-		-- TODO: Need to create some new method or ensure that certain status and variables are set properly
 		menu:addItem("Continue Game",  function() Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE) end)
+		menu:select("Continue Game")
 	end
-	
-	
-	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
-	menu:addItem("Sounds", transitionToSoundsScene)
-	-- menu:addItem("High Scores", function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 
--- 	menu:addItem(Noble.TransitionType.DIP_METRO_NEXUS, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_METRO_NEXUS) end)
-	-- menu:addItem(Noble.TransitionType.DIP_WIDGET_SATCHEL, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.DIP_WIDGET_SATCHEL) end)
-	-- menu:addItem(Noble.TransitionType.CROSS_DISSOLVE, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.CROSS_DISSOLVE) end)
-	-- menu:addItem(Noble.TransitionType.SLIDE_OFF_UP, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.SLIDE_OFF_UP) end)
-	-- menu:addItem(Noble.TransitionType.SLIDE_OFF_DOWN, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.SLIDE_OFF_DOWN) end)
-	-- menu:addItem(Noble.TransitionType.SLIDE_OFF_LEFT, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.SLIDE_OFF_LEFT) end)
-	-- menu:addItem(Noble.TransitionType.SLIDE_OFF_RIGHT, function() Noble.transition(ExampleScene2, 1, Noble.TransitionType.SLIDE_OFF_RIGHT) end)
+	menu:addItem("Instructions", function() Noble.transition(InstructionsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
+
 	menu:addItem( -- is it possible to change this setting with D-pad?
 		"Difficulty",
 		function()
@@ -60,7 +34,7 @@ function scene:init()
 		nil,
 		"Difficulty: " .. Noble.Settings.get("Difficulty")
 	)
-	menu:addItem("Credits", function() Noble.transition(CreditsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end) -- Need to update to new screen
+	menu:addItem("Credits", function() Noble.transition(CreditsScene, 1, Noble.TransitionType.DIP_TO_BLACK) end)
 
 	local crankTick = 0
 
@@ -90,20 +64,18 @@ end
 
 function transitionNewGame()
 	Noble.GameData.Status = GameStatus.New 
+	if Noble.GameData.Bet == nil then
+		Noble.GameData.Bet = 1
+	end
 	Noble.transition(GameScene, 1, Noble.TransitionType.DIP_TO_WHITE)
 end
 
 function transitionToSoundsScene()
-	print("in transitionToSoundsScene function")
 	Noble.transition(SoundsScene, 1, Noble.TransitionType.DIP_TO_BLACK)
 end
 
 function scene:enter()
 	scene.super.enter(self)
-
-	sequence = Sequence.new():from(0):to(100, 1.5, Ease.outBounce)
-	sequence:start();
-
 end
 
 function scene:start()
@@ -111,46 +83,41 @@ function scene:start()
 
 	menu:activate()
 	Noble.Input.setCrankIndicatorStatus(false)
-
 end
 
 function scene:drawBackground()
 	scene.super.drawBackground(self)
-
-	-- background:draw(0, 0)
+	
+	  -- Set the background image
+	assert( backgroundImage )
+	-- Background image adjusted by one pixel to display white line on the right 
+	backgroundImage:draw( -1, 0 )
 end
 
 function scene:update()
 	scene.super.update(self)
 
-	Graphics.setColor(Graphics.kColorBlack)
-	-- Graphics.setDitherPattern(0.2, Graphics.image.kDitherTypeScreen)
-	-- Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
-	Graphics.fillRect(240, 0, 160, 240)
-	menu:draw(250, 20)
-	-- menu:draw(30, sequence:get()-15 or 100-15)
+ 	gfx.setColor(Graphics.kColorBlack)
+ 	gfx.fillRect(240, 0, 160, 240)
+ 	menu:draw(250, 20)
 
 	-- Graphics.setColor(Graphics.kColorWhite)
-	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
-	local version_num = "v" .. playdate.metadata.version 
-	Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
-
-	-- Graphics.setColor(Graphics.kColorWhite)
-	-- Graphics.fillRoundRect(260, -20, 130, 65, 15)
-	-- logo:setInverted(true)
-	-- logo:draw(275, 8)
 	
-	-- https://devforum.play.date/t/using-glyphs-illustrated-in-designing-for-playdate/3678
-	-- playdate.graphics.drawTextAligned("Emoji _Glyphs!_ 🟨⊙🔒🎣✛⬆️➡️⬇️⬅️", 200, 50, kTextAlignment.center)
+	-- When this fill is set, it then draw the background as white, which hides the background image		
+	-- gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+	-- local version_num = "v" .. playdate.metadata.version 
+	-- Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+	-- 
+	-- -- This is then set so the background image is visible 
+	-- Unfortunately, when leaving the Game Scene, it causes weirdness here. :( )
+	-- gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)
+
 end
 
 function scene:exit()
 	scene.super.exit(self)
 
 	Noble.Input.setCrankIndicatorStatus(false)
-	sequence = Sequence.new():from(100):to(240, 0.25, Ease.inSine)
-	sequence:start();
-
 end
 
 function scene:finish()

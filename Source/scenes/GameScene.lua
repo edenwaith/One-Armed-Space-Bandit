@@ -4,23 +4,16 @@ local scene = GameScene
 
 scene.baseColor = Graphics.kColorBlack
 
--- local background
--- local logo
--- local menu
 local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
-local sequence
-local money = 30
+
 -- NOTE: Lua uses snake case to name variables and methods
-local currentBet = 1
 local crankTick = 0
 local is_crank_starting = false
-
 local is_currently_spinning = false 
--- local difficulty = gameDifficulty() -- 1 is hard, 2 is medium, 3 is easy
--- local handicap = (difficulty - 1) * 5
-local youLostMessages = {"You Lose", "Tough Luck", "It's Hopeless", "Eat Sand", "Suck Methane", "So Sorry", "Not A Chance"}
-local spinMessage = "Press Ⓐ or pull the crank down to spin"
+
+local youLostMessages = {"*You Lose*", "*Tough Luck*", "*It's Hopeless*", "*Eat Sand*", "*Suck Methane*", "*So Sorry*", "*Not A Chance*"}
+local spinMessage = "*Press* Ⓐ *or pull the crank down to spin*"
 
 local roll = 0
 
@@ -38,6 +31,7 @@ local skull_image = gfx.image.new("images/skull-dithered")
 local cherry_image = gfx.image.new("images/cherries-dithered")
 local eye_image = gfx.image.new("images/eye-dithered")
 local diamond_image = gfx.image.new("images/diamond-dithered")
+local laserBeamImage = gfx.image.new("images/laser-table-6")
 
 local images_array = {skull_image, cherry_image, eye_image, diamond_image}
 
@@ -45,15 +39,25 @@ local images_array = {skull_image, cherry_image, eye_image, diamond_image}
 -- Skull, cherry, diamond, eye
 
 -- Sprite Varaibles
-local first_slot_sprite = gfx.sprite.new(images_array[2])
-local second_slot_sprite = gfx.sprite.new(images_array[1])
+local first_slot_sprite = gfx.sprite.new(images_array[3])
+local second_slot_sprite = gfx.sprite.new(images_array[2])
 local third_slot_sprite = gfx.sprite.new(images_array[4])
+
+local cherriesImageTable = gfx.imagetable.new("images/cherries")
+local diamondsImageTable = gfx.imagetable.new("images/diamond")
+local eyesImageTable = gfx.imagetable.new("images/eye")
+local skullsImageTable = gfx.imagetable.new("images/skull")
+local laserImageTable = gfx.imagetable.new("images/laser")
+
+local firstSlotAnimationLoop
+local secondSlotAnimationLoop
+local thirdSlotAnimationLoop
 
 -- Sound variables
 local synthPlayer = snd.synth.new(snd.kWaveSquare)
 local blipSound = snd.sequence.new('sounds/sound25.mid')
-local blipMP3Player = snd.fileplayer.new("sounds/Sound25")
-local blipWAVPlayer = snd.sampleplayer.new("sounds/Sound25.wav")
+
+local laserSoundTimer
 
 -- Enumerations in Lua: https://unendli.ch/posts/2016-07-22-enumerations-in-lua.html
 RollStatus = {
@@ -71,10 +75,6 @@ RollStatus = {
 function scene:init()
 	scene.super.init(self)
 
-	print("GameScene init")
-	-- Trying to reference "os" causes a crash, doesn't know what "os" is 
-	-- math.randomseed(os.time()) -- initially seed the random number generator
-
 	-- The Playdate dev docs recommend this to seed the random number generator
 	-- https://sdk.play.date/2.3.1/Inside%20Playdate.html#f-getSecondsSinceEpoch
 	-- When I leave the scene and come back, the roll seems to be the same value
@@ -82,145 +82,90 @@ function scene:init()
 	-- back to win again.  Is this randomization enough?
 	math.randomseed(playdate.getSecondsSinceEpoch())
 
-
 	scene.inputHandler = {
-		-- upButtonDown = function()
-		-- 	menu:selectPrevious()
-		-- end,
-		-- downButtonDown = function()
-		-- 	menu:selectNext()
-		-- end,
 		
 		cranked = function(change, acceleratedChange)
 			
-			--if (is_crank_starting == true) then
-				crankTick = crankTick + change
-			--end
+			crankTick = crankTick + change
 			
 			local crank_position = playdate.getCrankPosition()
 			
-			print("crank_position: " .. crank_position)
-			
 			if (crank_position < 360 and crank_position > 350 and is_crank_starting == false) then
-				print("Crank is up!")
 				is_crank_starting = true
 			end
 			
 			-- One can also crank the "wrong" direction and trigger this.
 			-- Might need to just calculate the change
+			-- If the crank position is top, its value will be around 360 or 0.
+			-- Pulling down will have a value going from 360 and down to 180
+			-- when the crank is pointing down.
 			if (crank_position < 190 and crank_position > 170 and is_crank_starting == true) then
-			-- if (crankTick < -190 and crankTick < -170 and is_crank_starting == true) then
-				print("Crank is down")
 				is_crank_starting = false
 				crankTick = 0
 				spin()
 			end
-			
-			-- If the crank position is top, its value will be around 360 or 0.
-			-- Pulling down will have a value going from 360 and down to 180
-			-- when the crank is pointing down.
-			
-			-- if (crankTick > 30 or crankTick < -30) then
-			-- 	print("crankTick was originally: " .. crankTick)
-			-- end
-			-- 
-			-- if (crankTick > 30) then
-			-- 	crankTick = 0
-			-- 	-- menu:selectNext()
-			-- elseif (crankTick < -30) then
-			-- 	crankTick = 0
-			-- 	-- menu:selectPrevious()
-			-- end
-			
-			print("cranked value: " .. crankTick .. " change: " .. change .. " and acceleratedChange: " .. acceleratedChange)
+
 		end,
 		
-		-- AButtonDown = function()
-		-- 	menu:click()
-		-- end,
 		upButtonUp = function()
-			-- TODO: Need to check that the game isn't currently spinning
+			
 			if is_currently_spinning == false then
-				if currentBet < 3 then
-					currentBet = currentBet + 1
+				if Noble.GameData.Bet < 3 then
+					Noble.GameData.Bet += 1
 				end
 			end
 		end,
+		
 		downButtonUp = function()
 			if is_currently_spinning == false then
-				if currentBet > 1 then
-					currentBet = currentBet - 1
+				if Noble.GameData.Bet > 1 then
+					Noble.GameData.Bet -= 1
 				end
 			end
 		end,
-		leftButtonUp = function()
-			print("Left button up")
-			-- Simulate win state
-			Noble.GameData.Status = GameStatus.Won
-			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
-		end, 
-		rightButtonHold = function()
-			print("You're broke!")
-			Noble.GameData.Status = GameStatus.Broke 
-			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
-		end,
-		rightButtonUp = function()
-			print("Right button up")
-			-- Simulate death state 
-			Noble.GameData.Status = GameStatus.Death
-			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
-		end,
-	-- Add left and right D-pad buttons to get to different end game states
+	
 		AButtonDown = spin,
+		
 		BButtonDown = function()
 			if is_currently_spinning == false then
-			-- Go back to the previous screen
-				Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN)
+				-- Go back to the previous screen
+				Noble.transition(TitleScene, 1, Noble.TransitionType.SLIDE_OFF_DOWN) 
 			end
 		end
-		
 	}
 
 end
 
 function scene:enter()
 	scene.super.enter(self)
-	print("GameScene enter")
-
 	
-
-	sequence = Sequence.new():from(0):to(100, 1.5, Ease.outBounce)
-	sequence:start();
-	
-	-- Might only need to set this if the player isn't already playing
-	-- Or have some other option to continue an existing game
 	if Noble.GameData.Status == GameStatus.New then
-		money = 30
+		-- Idea: Perhaps adjust the initial amount of $ to differ based on difficulty level
+		Noble.GameData.Money = 30
 		roll_status = RollStatus.NotPlaying
+		spinMessage =  "*Press* Ⓐ *or pull the crank down to spin*"
+		
+		-- Set the initial images when starting
+		first_slot_image = math.random(1, 4)
+		first_slot_sprite:setImage(images_array[first_slot_image]) 
+		first_slot_sprite.update = nil 
+		second_slot_image = math.random(1, 4)
+		second_slot_sprite:setImage(images_array[second_slot_image]) 
+		second_slot_sprite.update = nil
+		third_slot_image = math.random(1, 4)
+		third_slot_sprite:setImage(images_array[third_slot_image]) 
+		third_slot_sprite.update = nil 
 	end 
 	
 	Noble.GameData.Status = GameStatus.Playing
-	
-	-- Set the initial images when starting
-	first_slot_image = math.random(1, 4)
-	first_slot_sprite:setImage(images_array[first_slot_image]) 
-	second_slot_image = math.random(1, 4)
-	second_slot_sprite:setImage(images_array[second_slot_image]) 
-	third_slot_image = math.random(1, 4)
-	third_slot_sprite:setImage(images_array[third_slot_image]) 
 	
 end
 
 function scene:start()
 	scene.super.start(self)
-	print("GameScene start")
 
 	local difficulty = Noble.Settings.get("Difficulty")
-	print("Game difficulty is set to " .. difficulty)
-	
 	rollStatus = RollStatus.NotPlaying
-	print("Roll Status: ", rollStatus)
-	
 	
 	first_slot_sprite:moveTo(90, 120)
 	first_slot_sprite:add()
@@ -230,16 +175,6 @@ function scene:start()
 	
 	third_slot_sprite:moveTo(308, 120)
 	third_slot_sprite:add()
-
-	-- This font looks a little too small: is it possible to enlarge?	
-	-- local sierraFont = gfx.font.new('fonts/Sierra-AGI-Basic-Latin-and-Supplement')
-	-- gfx.setFont(sierraFont)
-
-	-- menu:activate()
-	-- if playdate.isCrankDocked() == true then
-	-- 	Noble.Input.setCrankIndicatorStatus(true)
-	-- end
-
 end
 
 function scene:drawBackground()
@@ -247,59 +182,35 @@ function scene:drawBackground()
 
 	  -- Set the background image
 	local backgroundImage = gfx.image.new( "images/Slots-Background" ) -- RoomAbkg
-	-- Crash: scenes/GameScene.lua:133: attempt to index a nil value (local 'backgroundImage')
+	
 	assert( backgroundImage )
 	
-	backgroundImage:draw( 0, 0 )
+	backgroundImage:draw(0, 0)
 end
 
 
 function scene:update()
 	scene.super.update(self)
-
--- 	Graphics.setColor(Graphics.kColorWhite)
--- 	Graphics.setDitherPattern(0.2, Graphics.image.kDitherTypeScreen)
--- 	Graphics.fillRoundRect(15, (sequence:get()*0.75)+3, 185, 145, 15)
--- 	-- menu:draw(30, sequence:get()-15 or 100-15)
--- 
--- 	Graphics.setColor(Graphics.kColorBlack)
--- 	Graphics.fillRoundRect(260, -20, 130, 65, 15)
-	-- logo:setInverted(false)
-	-- logo:draw(275, 8)
-	
--- 	local backgroundImage = gfx.image.new( "images/RoomAbkg" )
-	-- assert( backgroundImage )
---	backgroundImage:draw( 0, 0 )
 	
 	Graphics.setColor(Graphics.kColorBlack)
 	Graphics.fillRect(0, 0, 400, 25)
 	
-	-- Graphics.setColor(Graphics.kColorBlack)
+	-- Dark black bar at bottom of the screen
 	Graphics.fillRect(0, 215, 400, 25)
--- 	
  	Graphics.setColor(Graphics.kColorWhite)
--- 
--- 	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
 	Graphics.setImageDrawMode(gfx.kDrawModeFillWhite) -- this causes the background image to disappear.
-	local winnings = "*You have $" .. money .. "*" -- Concatenate the string with the money value
+
+	local winnings = "*You have $" .. Noble.GameData.Money .. "*" -- Concatenate the string with the money value
 	Noble.Text.draw(winnings, 15, 4, Noble.Text.ALIGN_LEFT)
  	
-	local bet = "*You bet $" .. currentBet .. "*"
+	local bet = "*You bet $" .. Noble.GameData.Bet .. "*"
 	Noble.Text.draw(bet, 300, 4, Noble.Text.ALIGN_LEFT)
 	
-	
-	
 	Noble.Text.draw(spinMessage, 200, 219, Noble.Text.ALIGN_CENTER)
-	
-	-- -- Graphics.setColor(Graphics.kColorBlack)
-	-- Graphics.fillRect(86, 56, 8, 8)
-	-- Graphics.fillRect(196, 56, 8, 8)
-	-- Graphics.fillRect(305, 56, 8, 8)
 	
 	updateSquares()
 	
 	Graphics.setImageDrawMode(gfx.kDrawModeCopy ) -- Call this so the background is visible and isn't just a white screen
-	
 end
 
 function updateSquares()
@@ -324,7 +235,7 @@ function updateSquares()
 		Graphics.setColor(Graphics.kColorWhite)
 	end
 	
-	Graphics.fillRect(86, 56, 8, 8)
+	Graphics.fillRect(86, 55, 8, 8)
 	
 	-- Second slot
 	 if rotations < secondSlotRotations then
@@ -340,7 +251,7 @@ function updateSquares()
 	end	
 	
 	-- Third slot
-	Graphics.fillRect(196, 56, 8, 8)
+	Graphics.fillRect(196, 55, 8, 8)
 	
 	if rotations < thirdSlotRotations then
 		
@@ -354,7 +265,7 @@ function updateSquares()
 		Graphics.setColor(Graphics.kColorWhite)
 	end	
 	
-	Graphics.fillRect(305, 56, 8, 8)
+	Graphics.fillRect(305, 55, 8, 8)
 
 end
 
@@ -362,14 +273,13 @@ function scene:exit()
 	scene.super.exit(self)
 
 	-- Need to clear out the sprites, otherwise they remain on the screen
-	-- gfx.clear(gfx.kColorWhite)
 	first_slot_sprite:remove()
 	second_slot_sprite:remove()
 	third_slot_sprite:remove()
-
-	Noble.Input.setCrankIndicatorStatus(false)
-	sequence = Sequence.new():from(100):to(240, 0.25, Ease.inSine)
-	sequence:start();
+	
+	if laserSoundTimer ~= nil then 
+		laserSoundTimer:remove()
+	end
 
 end
 
@@ -378,9 +288,6 @@ function scene:finish()
 end
 
 function spin()
-	
-	-- TODO: Need to check if things are currently spinning, and if so
-	-- do not do anything here so it doesn't try to spin again
 		
 	if is_currently_spinning == true then 
 		return 
@@ -390,16 +297,20 @@ function spin()
 	
 	spinMessage = "" -- Reset this message on a new spin
 	
-	if (currentBet > money) then
+	if (Noble.GameData.Bet > Noble.GameData.Money) then
+		-- NOTE: If Money is -1, then the player should already be dead. 
+		is_currently_spinning = false 
 		spinMessage = "Sorry, you don't have enough to bet that much."
 	else
-	
+
 		roll = math.random(1, 100)
 		local handicap = handicap()
 		
 		if (roll < 3) then  -- Death
 			roll_status = RollStatus.Death
-		elseif roll < (5 + handicap) then -- 3 Diamonds
+		elseif roll < (5 + math.floor(handicap/2)) then -- 3 Diamonds
+			-- The handicap is reduced since it resulted in too many 3 Diamonds and 
+			-- very few 3 eyes
 			roll_status = RollStatus.Diamonds
 		elseif roll < (7 + handicap) then -- 3 Eyes
 			roll_status = RollStatus.Eyes
@@ -413,19 +324,13 @@ function spin()
 			roll_status = RollStatus.Lost 
 		end
 		
-		-- turns = turns + 1
-		money = money - currentBet -- Money for the turn 
-		
-		print("You have $" .. money)
-		print("The roll was " .. roll)
+		Noble.GameData.Money -= Noble.GameData.Bet -- Money for the turn 
 		
 		rotations = 0
 		firstSlotRotations = math.random(5, 11) -- initially 10 to 23
 		secondSlotRotations = math.random(13, 19) -- initially 26 to 38
 		thirdSlotRotations = math.random(21, 26) -- initially 42 to 53
-		
-		print("Slot rotations are 1: " .. firstSlotRotations .. " 2: " .. secondSlotRotations .. " 3: " .. thirdSlotRotations)
-		
+
 		playBlipSound()
 	end
 end
@@ -449,8 +354,6 @@ end
 
 function continueSpinning()
 	
-	-- print("Slot rotations are 1: " .. firstSlotRotations .. " 2: " .. secondSlotRotations .. " 3: " .. thirdSlotRotations)
-	
 	rotations = rotations + 1
 	local modVal = rotations % 4 + 1 -- Need to ensure it is never zero
 	local first_image = (rotations + first_slot_image) % 4 + 1
@@ -458,18 +361,17 @@ function continueSpinning()
 	local third_image = (rotations + third_slot_image) % 4 + 1
 	local handicap = handicap()
 	
-	-- print("first_image: " .. first_image .. " second_image: " .. second_image .. " third_image: " .. third_image)
-	
 	if rotations <= thirdSlotRotations then
 		
 		-- Need to update the UI here
-		
 		if rotations < firstSlotRotations then
 			
 			first_slot_sprite:setImage(images_array[first_image]) 
+			first_slot_sprite.update = nil -- Clear out animations
 			first_slot_image = first_image
 			
 		elseif rotations == firstSlotRotations then
+			
 			if (roll_status == RollStatus.Death) then -- Death
 				first_slot_image = 1
 				first_slot_sprite:setImage(images_array[1])
@@ -500,7 +402,8 @@ function continueSpinning()
 		
 		if rotations < secondSlotRotations then
 			second_slot_sprite:setImage(images_array[second_image]) 
-			second_slot_image = second_image -- This works, I guess.  My code is confusing me!
+			second_slot_sprite.update = nil -- Clear out animations
+			second_slot_image = second_image 
 		elseif rotations == secondSlotRotations then
 			if (roll_status == RollStatus.Death) then -- Death
 				second_slot_image = 1
@@ -533,6 +436,7 @@ function continueSpinning()
 		
 		-- Assume that the third slot is still spinning here
 		third_slot_sprite:setImage(images_array[third_image]) 
+		third_slot_sprite.update = nil -- Clear out animations
 		third_slot_image = third_image
 		
 		if rotations == thirdSlotRotations then
@@ -550,12 +454,8 @@ function continueSpinning()
 				 -- Need to select a random number, but it can't be 2 
 				 third_slot_image = random_image_num
 				 
-				 -- I think this logic is correct, I just need to ensure that first_slot_image and
-				 -- second_slot_image are getting set for all cases.  Perhaps all of these values 
-				 -- should be determined at the start of the spin...
 				if (first_slot_image == second_slot_image) and (second_slot_image == third_slot_image) then
 					third_slot_image = random_image_number(second_slot_image)
-					print("LOST! All three images were the same: " .. second_slot_image)
 				end
 				 
 				third_slot_sprite:setImage(images_array[third_slot_image])
@@ -565,7 +465,6 @@ function continueSpinning()
 				 
 				 if (first_slot_image == second_slot_image) and (second_slot_image == third_slot_image) then
 					 third_slot_image = random_image_number(second_slot_image)
-					 print("LOST! All three images were the same: " .. second_slot_image)
 				 end
 				  
 				 third_slot_sprite:setImage(images_array[third_slot_image])
@@ -575,44 +474,76 @@ function continueSpinning()
 		playBlipSound()
 	else
 	
-		is_currently_spinning = false 
 		local winnings = 0
+		local frameTime = 200 -- Experimental value of 200ms per frame
 		
-		if (roll < 3) then 
-			money = -1
-			spinMessage = "You lose, homeboy!"
-			playSound66()
-			Noble.GameData.Status = GameStatus.Death
-			Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+		if (roll < 3) then -- Death
+			Noble.GameData.Money = -1
+			spinMessage = "*You lose, homeboy!*"
 			
-		elseif roll < (5 + handicap) then
-			print("You got 3 diamonds")
-			winnings = 20 * currentBet
-			money = money + winnings
-		elseif roll < (7 + handicap) then
-			print("The Eyes have it")
-			winnings = 10 * currentBet
-			money = money + winnings
-		elseif roll < (11 + handicap) then
-			print("3 cherries")
-			winnings = 5 * currentBet
-			money = money + winnings
-		elseif roll < (18 + handicap) then
-			print("2 cherries")
-			winnings = 3 * currentBet
-			money = money + winnings
-		elseif roll < (34 + handicap) then
-			print("1 cherry")
-			winnings = 1 * currentBet
-			money = money + winnings
+			firstSlotAnimationLoop  = gfx.animation.loop.new(frameTime, skullsImageTable, true)
+			secondSlotAnimationLoop = gfx.animation.loop.new(frameTime, laserImageTable, false)
+			thirdSlotAnimationLoop  = gfx.animation.loop.new(frameTime, skullsImageTable, true)
+			
+			setupFirstSlotAnimation()
+			setupSecondSlotAnimation() -- For this case, do not keep looping
+			setupThirdSlotAnimation()
+			
+			-- Play the lost sound, and the laser timer will start about a second later
+			playYouLostSound()
+			
+			-- Wait 1 second (1000ms) then play the laser sound to give enough time for the animation to complete
+			laserSoundTimer = playdate.timer 
+			laserSoundTimer.performAfterDelay(1000, playLaserSound)
+			
+		elseif roll < (5 + math.floor(handicap/2)) then
+			
+			firstSlotAnimationLoop  = gfx.animation.loop.new(frameTime, diamondsImageTable, true)
+			secondSlotAnimationLoop = gfx.animation.loop.new(frameTime, diamondsImageTable, true)
+			thirdSlotAnimationLoop  = gfx.animation.loop.new(frameTime, diamondsImageTable, true)
+			
+			winnings = 20 * Noble.GameData.Bet
+			Noble.GameData.Money += winnings
+			
+		elseif roll < (7 + handicap) then -- 3 Eyes
+	
+			firstSlotAnimationLoop  = gfx.animation.loop.new(frameTime, eyesImageTable, true)
+			secondSlotAnimationLoop = gfx.animation.loop.new(frameTime, eyesImageTable, true)
+			thirdSlotAnimationLoop  = gfx.animation.loop.new(frameTime, eyesImageTable, true)
+			
+			winnings = 10 * Noble.GameData.Bet
+			Noble.GameData.Money += winnings
+			
+		elseif roll < (11 + handicap) then -- 3 Cherries 
+			
+			firstSlotAnimationLoop  = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			secondSlotAnimationLoop = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			thirdSlotAnimationLoop  = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			 
+			winnings = 5 * Noble.GameData.Bet
+			Noble.GameData.Money += winnings
+			
+		elseif roll < (18 + handicap) then -- 2 Cherries
+			
+			firstSlotAnimationLoop  = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			secondSlotAnimationLoop = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			winnings = 3 * Noble.GameData.Bet
+			Noble.GameData.Money += winnings
+			
+		elseif roll < (34 + handicap) then -- 1 Cherry
+			
+			firstSlotAnimationLoop = gfx.animation.loop.new(frameTime, cherriesImageTable, true)
+			winnings = 1 * Noble.GameData.Bet
+			Noble.GameData.Money += winnings
+			
 		else
-			--- print("You won NOTHING!  Good-day, sir!")
+			
 			msgNum = math.random(1, 7)
 			spinMessage = youLostMessages[msgNum]
-			print(youLostMessages[msgNum])
-			playSound27()
 			
-			if (money <= 0) then
+			playYouLostSound()
+			
+			if (Noble.GameData.Money <= 0) then
 				Noble.GameData.Status = GameStatus.Broke
 				Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
 			end
@@ -620,51 +551,67 @@ function continueSpinning()
 		end
 		
 		if winnings > 0 then
-			spinMessage = "You won $" .. winnings
-			playSound26()
+			-- The * are to create bold text
+			spinMessage = "*You won $" .. winnings .. "*"
 			
-			if (money >= 250) then
-				Noble.GameData.Status = GameStatus.Won
-				Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
-			end
+			playWinSound()
+			setupFirstSlotAnimation()
+			
+			-- May not need to check if the Lost status since this should only be winning states
+			if roll_status < 8 and roll_status ~= RollStatus.Lost then 
+				
+				if roll_status ~= RollStatus.OneCherry then
+					setupSecondSlotAnimation()
+				end 
+				
+				-- Any other states other than winning one or two cherries will animate
+				-- all three slots
+				if roll_status ~= RollStatus.OneCherry and roll_status ~= RollStatus.TwoCherries then
+					setupThirdSlotAnimation()
+				end 
+			end 
+			
 		end
 	
 	end
 
 end
 
+function setupFirstSlotAnimation()
+	first_slot_sprite.update = function()
+		first_slot_sprite:setImage(firstSlotAnimationLoop:image())
+	end
+end 
+
+function setupSecondSlotAnimation() 
+	second_slot_sprite.update = function()
+		second_slot_sprite:setImage(secondSlotAnimationLoop:image())
+	end
+end 
+
+function setupThirdSlotAnimation()
+	third_slot_sprite.update = function()
+		third_slot_sprite:setImage(thirdSlotAnimationLoop:image())
+	end
+end 
+
 function playBlipSound()
-	-- playBlipSoundMP3() -- too slow
-	-- playBlipSoundWAV() -- also too slow
-	playBlipSoundMIDI() -- this is way too fast
-end
-
-function playBlipSoundMP3()
-	blipMP3Player:setFinishCallback(blipSoundFinished)
-	blipMP3Player:play()
-end
-
-function playBlipSoundWAV()
-	-- samplePlayer
-	blipWAVPlayer:setFinishCallback(blipSoundFinished)
-	blipWAVPlayer:play()
+	playBlipSoundMIDI()
 end
 
 function playBlipSoundMIDI()
-	-- stopAllSounds()
-	
-	-- print("repeatCount is " .. repeatCount)
 	
 	local track1 = blipSound:getTrackAtIndex(1) -- May have to start at #2, experiment
 	local track2 = blipSound:getTrackAtIndex(2)
 	local track3 = blipSound:getTrackAtIndex(3) 
 	
-	-- scenes/GameScene.lua:276: synths may only be in one instrument or channel at a time
-	-- local blipSynthPlayer = synthPlayer:copy()
+	local blipSynthPlayer = synthPlayer:copy()
+	-- Lower the volume of the blip sound
+	blipSynthPlayer:setVolume(0.3)
 	
-	track1:setInstrument(synthPlayer:copy())
-	track2:setInstrument(synthPlayer:copy())
-	track3:setInstrument(synthPlayer:copy())
+	track1:setInstrument(blipSynthPlayer:copy())
+	track2:setInstrument(blipSynthPlayer:copy())
+	track3:setInstrument(blipSynthPlayer:copy())
 	blipSound:setTrackAtIndex(1, track1)
 	blipSound:setTrackAtIndex(2, track2)
 	blipSound:setTrackAtIndex(3, track3)
@@ -678,13 +625,11 @@ function playBlipSoundMIDI()
 end
 
 function blipSoundFinished()
-	-- print("Blip sound finished")
 	continueSpinning()
 end
 
-function playSound26()
-	-- stopAllSounds()
-	
+function playWinSound()
+
 	local sound26 = snd.sequence.new('sounds/Sound26.mid')
 	local track1 = sound26:getTrackAtIndex(1)
 	local track2 = sound26:getTrackAtIndex(2)
@@ -698,40 +643,63 @@ function playSound26()
 	sound26:setTrackAtIndex(3, track3)
 	sound26:setTempo(100)
 	
-	sound26:play()
+	sound26:play(winSoundFinished)
+end
+
+function winSoundFinished()
+
+	is_currently_spinning = false 
+	
+	if (Noble.GameData.Money >= 250) then
+		Noble.GameData.Status = GameStatus.Won
+		Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+	end
 end
 
 -- Did not win this round sound
 function playYouLostSound()
-	local mp3Player = snd.fileplayer.new("sounds/Sound27")
-	local currentVolume = mp3Player:getVolume()
-	print("Current mp3Player volume: " .. currentVolume)
+	local mp3Player = snd.fileplayer.new("sounds/YouLost-Even-Shorter")
+	mp3Player:setFinishCallback(lostSoundFinished)
 	mp3Player:play()
 end
 
--- Death sound
-function playSound66()
-	-- stopAllSounds()
+function playLaserSound()
 	
-	local sound66 = snd.sequence.new('sounds/Sound66.mid')
-	local track1 = sound66:getTrackAtIndex(1)
-	local track2 = sound66:getTrackAtIndex(2)
-	local track3 = sound66:getTrackAtIndex(3) 
+	if laserSoundTimer ~= nil then
+		laserSoundTimer:remove()
+	end
 	
-	-- This is how I've found that a sequence's volume can be changed
-	local synthPlayer66 = snd.synth.new(snd.kWaveSquare)
-	synthPlayer66:setVolume(0.5)
+	local laserSound = snd.sequence.new('sounds/Sound28.mid')
+	local track1 = laserSound:getTrackAtIndex(1)
+	local track2 = laserSound:getTrackAtIndex(2)
+	local track3 = laserSound:getTrackAtIndex(3)
 	
-	track1:setInstrument(synthPlayer66:copy())
-	track2:setInstrument(synthPlayer66:copy())
-	track3:setInstrument(synthPlayer66:copy())
-	sound66:setTrackAtIndex(1, track1)
-	sound66:setTrackAtIndex(2, track2)
-	sound66:setTrackAtIndex(3, track3)
-	-- Is there a way to set the volume, some of these are kind of loud
-	sound66:setTempo(200)
+	track1:setInstrument(synthPlayer:copy())
+	track2:setInstrument(synthPlayer:copy())
+	track3:setInstrument(synthPlayer:copy())
 	
-	sound66:play()
+	laserSound:setTrackAtIndex(1, track1)
+	laserSound:setTrackAtIndex(2, track2)
+	laserSound:setTrackAtIndex(3, track3)
+	
+	laserSound:setTempo(100)
+	
+	laserSound:play(laserSoundFinished)
+end
+
+function laserSoundFinished()
+
+	Noble.GameData.Status = GameStatus.Death
+	Noble.transition(EndGameScene, 1, Noble.TransitionType.CROSS_DISSOLVE)
+	
+	is_currently_spinning = false
+end 
+
+function lostSoundFinished()
+	-- Except for the Death roll, reset is_currently_spinning
+	if roll_status ~= RollStatus.Death then
+		is_currently_spinning = false 
+	end
 end
 
 function gameDifficulty()
@@ -748,5 +716,9 @@ end
 
 function handicap()
 	local difficulty = gameDifficulty()
-	return (difficulty - 1) * 5
+	-- The handicap is determined by multiplying the game difficulty by 5
+	-- Easy:   2 * 5 = 10
+	-- Medium: 1 * 5 = 5
+	-- Hard:   0 * 5 = 0
+	return difficulty * 5
 end
