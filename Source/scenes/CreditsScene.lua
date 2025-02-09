@@ -24,7 +24,7 @@ local foot_y_delta = -240
 
 local gippazoid_info = "*Slots-o-Death is another fine product by:*\nGippazoid Novelties\n2001 Odessa Blastway\nGurnville, Faydor\nExl Galaxy"
 local precious_memoriam = "\n\n*Dedication*\nIn memory of Precious"
-local credits_text = "*ONE-ARMED SPACE BANDIT*\nVersion " .. version_num .. "\nCopyright © 2024 Edenwaith\nedenwaith.itch.io/one-armed-space-bandit\n\n*Design, programming, graphics, etc.*\nChad Armstrong\n\n*Original Game Concept*\nThe Two Guys From Andromeda\n\n*Music*\nThe Liberty Bell\nThe Stars and Stripes Forever\nby\nJohn Philips Sousa\n\n*Beta Testers*\nMelissa Armstrong\nMikel Knight\nFester Blatz\n\n" .. gippazoid_info .. precious_memoriam
+local credits_text = "*ONE-ARMED SPACE BANDIT*\nVersion " .. version_num .. "\nCopyright © 2024 Edenwaith\nedenwaith.itch.io/one-armed-space-bandit\n\n*Design, programming, graphics, etc.*\nChad Armstrong\n\n*Original Game Concept*\nThe Two Guys From Andromeda\n\n*Music*\nThe Liberty Bell\nThe Stars and Stripes Forever\nby\nJohn Philips Sousa\n\n*Beta Testers*\nMelissa Armstrong\nMike  Piontek\nJulia Minamata\n\n" .. gippazoid_info .. precious_memoriam
 
 -- Timer variables
 local delayTimer

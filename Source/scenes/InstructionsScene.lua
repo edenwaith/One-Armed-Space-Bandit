@@ -7,7 +7,6 @@ local snd <const> = playdate.sound
 
 local default_font <const> = gfx.getSystemFont("normal")
 local sierra_font <const> = gfx.font.new("fonts/Sierra-AGI-Basic-Latin-and-Supplement")
-local betting2 <const> = gfx.image.new("images/Betting2") -- Might need to remove this
 
 scene.baseColor = Graphics.kColorWhite
 
@@ -97,7 +96,8 @@ function scene:update()
 	
 	if (instructions_page == InstructionsPage.Story ) then
 		gfx.drawText("*The story so far...*", 10, 40)
-		gfx.drawText(instructionsText, 10, 70, kTextAlignment.left, 2.0)
+		gfx.drawTextAligned(instructionsText, 10, 70, gfx.kAlignLeft, 2.0)
+		-- gfx.drawText(instructionsText, 10, 70, kTextAlignment.left, 2.0) -- This isn't appearing on the Playdate w/ system software 2.6
 		
 		-- Ⓐ
 		-- Ⓑ
@@ -126,8 +126,8 @@ function scene:update()
 		
 		-- Need to set the image draw mode to gfx.kDrawModeWhiteTransparent for the PD icons to appear correctly.
 		gfx.setImageDrawMode(gfx.kDrawModeWhiteTransparent)		
-		gfx.drawText("*Goal:* \nEarn 250 Buckazoids to win, but beware of \ngetting three skulls or losing all of your money!", 10, 40, kTextAlignment.left, 2.0)
-		gfx.drawTextAligned("*Controls:*\n⬆  :  Raise your bet\n⬇  :  Lower your bet\nⒶ or 🎣  :  Spin", 10, 110, kTextAlignment.left, 5.0)
+		gfx.drawTextAligned("*Goal:* \nEarn 250 Buckazoids to win, but beware of \ngetting three skulls or losing all of your money!", 10, 40, gfx.kAlignLeft, 2.0)
+		gfx.drawTextAligned("*Controls:*\n⬆  :  Raise your bet\n⬇  :  Lower your bet\nⒶ or 🎣  :  Spin", 10, 110, gfx.kAlignLeft, 5.0)
 		
 		Graphics.setColor(Graphics.kColorBlack)
 		Graphics.fillRect(0, 215, 400, 25)
@@ -150,9 +150,9 @@ function scene:update()
 		-- Vertical line 
 		gfx.drawLine(200, 60, 200, 204)
 		
-		gfx.drawText("1  Cherry \n2 Cherries \n3 Cherries \n3 Eyes \n3 Diamonds \n3 Skulls ", 20, 70, kTextAlignment.left, 2.0)
-		gfx.drawText("Wins 1 \nWins 3 \nWins 5 \nWins 10 \nWins 20 \n= DEATH!", 120, 70, kTextAlignment.left, 2.0)
-		gfx.drawText("1  =  1x Payoff\n2 = 2x Payoff\n3 = 3x Payoff", 210, 70, kTextAlignment.left, 2.0) 
+		gfx.drawTextAligned("1  Cherry \n2 Cherries \n3 Cherries \n3 Eyes \n3 Diamonds \n3 Skulls ", 20, 70, gfx.kAlignLeft, 2.0)
+		gfx.drawTextAligned("Wins 1 \nWins 3 \nWins 5 \nWins 10 \nWins 20 \n= DEATH!", 120, 70, gfx.kAlignLeft, 2.0)
+		gfx.drawTextAligned("1  =  1x Payoff\n2 = 2x Payoff\n3 = 3x Payoff", 210, 70, gfx.kAlignLeft, 2.0) 
 		
 		-- Bottom bar 
 		Graphics.setColor(Graphics.kColorBlack)
