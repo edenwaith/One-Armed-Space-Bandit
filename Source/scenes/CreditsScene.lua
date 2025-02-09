@@ -124,6 +124,8 @@ function foot_animation_completed()
 	-- Animate the foot off again to original position and scroll the credits back up
 	footTimer:remove()
 	
+	ScreenShake(400, 10)
+	
 	playdate.timer.performAfterDelay(500, function() 
 		-- Ensure that text_y_delta is 240 in case of any rounding errors
 		text_y_delta = 240

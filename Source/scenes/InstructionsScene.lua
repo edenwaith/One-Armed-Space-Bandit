@@ -53,6 +53,8 @@ function change_page(page_num)
 	if page_num > 0 then
 		if (instructions_page < InstructionsPage.Count - 1) then
 			instructions_page += 1
+		else 
+			ScreenShake(250, 4)
 		end
 	end 
 	
