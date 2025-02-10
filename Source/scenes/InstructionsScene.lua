@@ -54,6 +54,7 @@ function change_page(page_num)
 		if (instructions_page < InstructionsPage.Count - 1) then
 			instructions_page += 1
 		else 
+			playYouLostSound() -- Declared in GameScene
 			ScreenShake(250, 4)
 		end
 	end 

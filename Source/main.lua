@@ -99,11 +99,19 @@ function loadGameData()
     
 end
 
--- From: https://sdk.play.date/2.6.2/Inside%20Playdate.html#f-display.setOffset
--- Also from: https://github.com/stuartbnicholson/lonefury/blob/master/source/main.lua
 -- This function relies on the use of timers, so the timer core library
 -- must be imported, and updateTimers() must be called in the update loop
+-- References:
+--   Playdate: https://sdk.play.date/2.6.2/Inside%20Playdate.html#f-display.setOffset
+--   Lone Fury: https://github.com/stuartbnicholson/lonefury/blob/master/source/main.lua
+--   Hexa: https://github.com/stuffbyrae/hexa/blob/master/source/main.lua
 function ScreenShake(shakeTime, shakeMagnitude)
+    
+    -- If reduce flashing is enabled, then don't shake.
+    if playdate.getReduceFlashing() then 
+        return
+    end
+    
     -- Creating a value timer that goes from shakeMagnitude to 0, over
     -- the course of 'shakeTime' milliseconds
     local shakeTimer = playdate.timer.new(shakeTime, shakeMagnitude, 0)
