@@ -13,6 +13,7 @@ import 'scenes/TitleScene'
 import 'scenes/InstructionsScene'
 import 'scenes/GameScene'
 import 'scenes/CreditsScene'
+import 'scenes/TemplateScene'
 
 
 GameStatus = {
@@ -98,11 +99,42 @@ function loadGameData()
     
 end
 
+-- This function relies on the use of timers, so the timer core library
+-- must be imported, and updateTimers() must be called in the update loop
+-- References:
+--   Playdate: https://sdk.play.date/2.6.2/Inside%20Playdate.html#f-display.setOffset
+--   Lone Fury: https://github.com/stuartbnicholson/lonefury/blob/master/source/main.lua
+--   Hexa: https://github.com/stuffbyrae/hexa/blob/master/source/main.lua
+function ScreenShake(shakeTime, shakeMagnitude)
+    
+    -- If reduce flashing is enabled, then don't shake.
+    if playdate.getReduceFlashing() then 
+        return
+    end
+    
+    -- Creating a value timer that goes from shakeMagnitude to 0, over
+    -- the course of 'shakeTime' milliseconds
+    local shakeTimer = playdate.timer.new(shakeTime, shakeMagnitude, 0)
+    -- Every frame when the timer is active, we shake the screen
+    shakeTimer.updateCallback = function(timer)
+        -- Using the timer value, so the shaking magnitude
+        -- gradually decreases over time
+        local magnitude = math.floor(timer.value)
+        local shakeX = math.random(-magnitude, magnitude)
+        local shakeY = math.random(-magnitude, magnitude)
+        playdate.display.setOffset(shakeX, shakeY)
+    end
+    -- Resetting the display offset at the end of the screen shake
+    shakeTimer.timerEndedCallback = function()
+        playdate.display.setOffset(0, 0)
+    end
+end
+
 loadGameData()
 
 Noble.showFPS = false
 
 -- Load in the TitleScene
-Noble.new(TitleScene, 1.5, Noble.TransitionType.CROSS_DISSOLVE)
+Noble.new(TitleScene, 1.5, Noble.TransitionType.DIP_TO_BLACK)
 
 

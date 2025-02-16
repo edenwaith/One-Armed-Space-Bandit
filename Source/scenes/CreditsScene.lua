@@ -124,6 +124,8 @@ function foot_animation_completed()
 	-- Animate the foot off again to original position and scroll the credits back up
 	footTimer:remove()
 	
+	ScreenShake(400, 10)
+	
 	playdate.timer.performAfterDelay(500, function() 
 		-- Ensure that text_y_delta is 240 in case of any rounding errors
 		text_y_delta = 240
@@ -176,7 +178,7 @@ function scene:update()
 	Graphics.setColor(Graphics.kColorBlack)
 	Graphics.fillRect(0, 0, 400, 28)
 	
-	playdate.graphics.setImageDrawMode(gfx.kDrawModeFillWhite)
+	gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
 	Utilities.drawTextScaled("CREDITS", 200, 14, 2, sierra_font)
 end
 
@@ -208,6 +210,7 @@ function scene:finish()
 	
 	text_y_delta = 50 
 	foot_y_delta = -240
+	precious_y_delta = 680
 	
 	-- This then causes the background image on the Title Scene to go all black
 	-- Called at this point so the transition effect works
