@@ -1,12 +1,19 @@
+import "CoreLibs/sprites"
+import "CoreLibs/timer"
+
+import "libraries/Tanuk_CodeSequence"
+
 TitleScene = {}
 class("TitleScene").extends(NobleScene)
 local scene = TitleScene
 
+local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
 local backgroundImage = gfx.image.new( "images/Title-Scene" ) 
 local menu
 local difficultyValues = {"Easy", "Medium", "Hard"}
+
 
 function scene:init()
 	scene.super.init(self)
@@ -59,6 +66,22 @@ function scene:init()
 			menu:click()
 		end
 	}
+	
+	-- Commented out because it might be causing the game to lock up
+	-- print("About to initialize RUBDUBDUB")
+	-- 
+	-- -- RUBDUBDUB cheat code: https://www.playdate-wiki.com/wiki/RUBDUBDUB
+	-- local cheatCode = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB}, function() 
+	-- 	print("Cheater! You win!") 
+	-- end, true)
+	-- 
+	-- local cheatCodeTwo = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonRight, pd.kButtonLeft, pd.kButtonLeft}, function()
+	-- 		Noble.GameData.CheatMode = true 
+	-- 		print("Cheat mode: " .. tostring(Noble.GameData.CheatMode)) 
+	-- 		
+	-- end, true)
+	
+	-- local cheatCodeThree = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB}, function() print("RUB") end, true)
 
 end
 

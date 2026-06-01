@@ -208,6 +208,8 @@ function scene:update()
 	
 	Noble.Text.draw(spinMessage, 200, 219, Noble.Text.ALIGN_CENTER)
 	
+	Graphics.setImageDrawMode(gfx.kDrawModeFillBlack)
+	
 	updateSquares()
 	
 	Graphics.setImageDrawMode(gfx.kDrawModeCopy ) -- Call this so the background is visible and isn't just a white screen

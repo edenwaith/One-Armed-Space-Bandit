@@ -16,6 +16,8 @@ import 'scenes/CreditsScene'
 import 'scenes/TemplateScene'
 
 
+local cheatModeEnabled = false
+
 GameStatus = {
     Death = 1,
     Broke = 2,
@@ -32,8 +34,18 @@ Noble.Settings.setup({
 Noble.GameData.setup({
     Bet = 1,
     Money = 30,
-    Status = GameStatus.NotPlaying
+    Status = GameStatus.NotPlaying,
+    CheatMode = false
 })
+
+local gfx <const> = playdate.graphics
+-- local pauseImage <const> = gfx.image.new("images/pillars_small_shidoku_dithered_4x4")
+
+-- Is this already being handled by Noble Engine?
+-- function playdate.update()
+--     playdate.graphics.sprite.update()
+--     playdate.timer.updateTimers()
+-- end
 
 -- Automatically save game data when the player chooses
 -- to exit the game via the System Menu or Menu button
@@ -45,6 +57,43 @@ end
 -- to low-power sleep mode because of a low battery
 function playdate.gameWillSleep()
     saveGameData()
+end
+
+-- Set up the Pause screen when the Home button is pressed
+function playdate.gameWillPause()
+    print("Welcome to the pause screen")
+    print("Cheat mode status: " .. tostring(Noble.GameData.CheatMode))
+    if Noble.GameData.CheatMode == true then
+        print("Show cheat mode menu")
+    else
+        print("You aren't cheating")
+    end
+    
+    local pauseImage = gfx.image.new("images/pillars_small_shidoku_dithered_4x4")
+    assert(pauseImage)
+    
+    gfx.pushContext(pauseImage)
+        local versionString = "*v" .. playdate.metadata.version .. "*"
+        
+        -- Set both of these to black to ensure the background remains dark, even on the game screen
+        Graphics.setColor(Graphics.kColorBlack)
+        gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+        gfx.setDitherPattern(0.25, gfx.image.kDitherTypeBayer4x4)
+        playdate.graphics.fillRect(0, 215, 200, 240)
+        
+        -- Clear the dithering pattern
+        gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+        gfx.drawText(versionString, 80, 221)
+        
+        gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+        -- gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+        -- Utilities.drawTextScaled(titleText, 200, 14, 2, sierra_font)
+        
+        gfx.drawText(versionString, 80, 220)
+        gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+    
+    gfx.popContext()
+    playdate.setMenuImage(pauseImage)
 end
 
 function saveGameData()
@@ -92,6 +141,9 @@ function loadGameData()
         
         local moneyValue = tempSaveData["Money"] or 30 -- Noble.GameData.get("Money", 1)
         Noble.GameData.Money = moneyValue
+        
+        -- When starting up the game, have cheat mode disabled
+        Noble.GameData.CheatMode = false
         
     else
         print("tempSaveData was nil")
