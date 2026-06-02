@@ -67,21 +67,11 @@ function scene:init()
 		end
 	}
 	
-	-- Commented out because it might be causing the game to lock up
-	-- print("About to initialize RUBDUBDUB")
-	-- 
 	-- -- RUBDUBDUB cheat code: https://www.playdate-wiki.com/wiki/RUBDUBDUB
-	-- local cheatCode = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB}, function() 
-	-- 	print("Cheater! You win!") 
-	-- end, true)
-	-- 
-	-- local cheatCodeTwo = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonRight, pd.kButtonLeft, pd.kButtonLeft}, function()
-	-- 		Noble.GameData.CheatMode = true 
-	-- 		print("Cheat mode: " .. tostring(Noble.GameData.CheatMode)) 
-	-- 		
-	-- end, true)
-	
-	-- local cheatCodeThree = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB}, function() print("RUB") end, true)
+	local cheatCode = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB}, function() 
+	 	print("Cheater! You win!") 
+		 Noble.GameData.CheatMode = true
+	end, true)
 
 end
 

@@ -231,3 +231,6 @@ Implementing the menu image when the game is paused.  Used my updated ordered_di
 
 28 May 2026:
 Fixed an odd issue where the dark, dithered bar on the pause screen would sometimes be white when the Game screen was active.
+
+1 June 2026:
+Implemented the RUBDUBDUB cheat code functionality.  It appeared earlier attempts were causing issues, lock-ups, and crashes if more than one Tanuk cheat code was implemented. 

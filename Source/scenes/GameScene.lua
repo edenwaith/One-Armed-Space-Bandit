@@ -308,6 +308,11 @@ function spin()
 		roll = math.random(1, 100)
 		local handicap = handicap()
 		
+		-- If CheatMode is enabled, set the roll value to 4 (3 Diamonds)
+		if (Noble.GameData.CheatMode == true) then
+			roll = 4
+		end 
+		
 		if (roll < 3) then  -- Death
 			roll_status = RollStatus.Death
 		elseif roll < (5 + math.floor(handicap/2)) then -- 3 Diamonds
@@ -325,6 +330,8 @@ function spin()
 		else -- Lost
 			roll_status = RollStatus.Lost 
 		end
+		
+
 		
 		Noble.GameData.Money -= Noble.GameData.Bet -- Money for the turn 
 		
