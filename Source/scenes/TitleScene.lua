@@ -69,9 +69,9 @@ function scene:init()
 	
 	-- -- RUBDUBDUB cheat code: https://www.playdate-wiki.com/wiki/RUBDUBDUB
 	local cheatCode = Tanuk_CodeSequence({pd.kButtonRight, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB, pd.kButtonDown, pd.kButtonUp, pd.kButtonB}, function() 
-	 	print("Cheater! You win!") 
 		 Noble.GameData.CheatMode = true
-	end, true)
+		 playCheatSound() -- Found in GameScene.lua 
+	end, false)
 
 end
 
@@ -110,11 +110,14 @@ function scene:update()
  	gfx.setColor(Graphics.kColorBlack)
  	gfx.fillRect(240, 0, 160, 240)
  	menu:draw(250, 20)
-	 
-	-- When this fill is set, it then draw the background as white, which hides the background image		
-	gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-	local version_num = "v" .. playdate.metadata.version 
-	Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+
+	if Noble.GameData.CheatMode == true then	
+		-- When this fill is set, it then draw the background as white, which hides the background image
+		gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+		-- local version_num = "v" .. playdate.metadata.version 
+		local version_num = "❤️" -- indicates that cheat mode is enabled
+		Noble.Text.draw(version_num, 385, 220, Noble.Text.ALIGN_RIGHT) 
+	end
 	-- 
 	-- -- This is then set so the background image is visible 
 	gfx.setImageDrawMode(gfx.kDrawModeFillBlack)

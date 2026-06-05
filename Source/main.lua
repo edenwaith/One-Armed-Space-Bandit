@@ -39,13 +39,6 @@ Noble.GameData.setup({
 })
 
 local gfx <const> = playdate.graphics
--- local pauseImage <const> = gfx.image.new("images/pillars_small_shidoku_dithered_4x4")
-
--- Is this already being handled by Noble Engine?
--- function playdate.update()
---     playdate.graphics.sprite.update()
---     playdate.timer.updateTimers()
--- end
 
 -- Automatically save game data when the player chooses
 -- to exit the game via the System Menu or Menu button
@@ -61,14 +54,7 @@ end
 
 -- Set up the Pause screen when the Home button is pressed
 function playdate.gameWillPause()
-    print("Welcome to the pause screen")
-    print("Cheat mode status: " .. tostring(Noble.GameData.CheatMode))
-    if Noble.GameData.CheatMode == true then
-        print("Show cheat mode menu")
-    else
-        print("You aren't cheating")
-    end
-    
+
     local pauseImage = gfx.image.new("images/pillars_small_shidoku_dithered_4x4")
     assert(pauseImage)
     
@@ -79,16 +65,13 @@ function playdate.gameWillPause()
         Graphics.setColor(Graphics.kColorBlack)
         gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
         gfx.setDitherPattern(0.25, gfx.image.kDitherTypeBayer4x4)
-        playdate.graphics.fillRect(0, 215, 200, 240)
+        playdate.graphics.fillRect(0, 216, 200, 240)
         
         -- Clear the dithering pattern
         gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
         gfx.drawText(versionString, 80, 221)
         
         gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-        -- gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
-        -- Utilities.drawTextScaled(titleText, 200, 14, 2, sierra_font)
-        
         gfx.drawText(versionString, 80, 220)
         gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
     

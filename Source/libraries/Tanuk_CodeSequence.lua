@@ -43,6 +43,13 @@ function Tanuk_CodeSequence:update()
     --     [C]: in field 'update'
     --     libraries/noble/Noble.lua:430: in function <libraries/noble/Noble.lua:425>(playdate) 
 
+    local initialValue = self.sequence[self.sequenceIndex] 
+    
+    -- Also validate the first item in the sequence array is not empty to avoid the crash
+    if initialValue == nil then
+        return
+    end
+
     if self.sequence[self.sequenceIndex] & released ~= 0 then
         self.sequenceIndex = self.sequenceIndex + 1
         self.timerInput:reset()
