@@ -208,6 +208,8 @@ function scene:update()
 	
 	Noble.Text.draw(spinMessage, 200, 219, Noble.Text.ALIGN_CENTER)
 	
+	Graphics.setImageDrawMode(gfx.kDrawModeFillBlack)
+	
 	updateSquares()
 	
 	Graphics.setImageDrawMode(gfx.kDrawModeCopy ) -- Call this so the background is visible and isn't just a white screen
@@ -306,6 +308,12 @@ function spin()
 		roll = math.random(1, 100)
 		local handicap = handicap()
 		
+		-- If CheatMode is enabled, set the roll value to a random number from 3 to 35
+		-- So each roll should (almost always) win
+		if (Noble.GameData.CheatMode == true) then
+			roll = math.random(3, 35)
+		end 
+		
 		if (roll < 3) then  -- Death
 			roll_status = RollStatus.Death
 		elseif roll < (5 + math.floor(handicap/2)) then -- 3 Diamonds
@@ -323,6 +331,8 @@ function spin()
 		else -- Lost
 			roll_status = RollStatus.Lost 
 		end
+		
+
 		
 		Noble.GameData.Money -= Noble.GameData.Bet -- Money for the turn 
 		
@@ -627,6 +637,27 @@ end
 function blipSoundFinished()
 	continueSpinning()
 end
+
+-- Sound played (points chime) when the cheat mode is enabled
+function playCheatSound()
+	local cheatSound = snd.sequence.new('sounds/chime-square.mid')
+	local track1 = cheatSound:getTrackAtIndex(1)
+	local cheatSynthPlayer = synthPlayer:copy()
+	
+	-- Lower the volume of the chime sound
+	cheatSynthPlayer:setVolume(0.3)
+	
+	track1:setInstrument(cheatSynthPlayer:copy())
+
+	-- Set track1 to all three tracks to overwrite the older tracks	
+	cheatSound:setTrackAtIndex(1, track1)
+	cheatSound:setTrackAtIndex(2, track1)
+	cheatSound:setTrackAtIndex(3, track1)
+	
+	cheatSound:setTempo(200)
+	
+	cheatSound:play()
+end 
 
 function playWinSound()
 

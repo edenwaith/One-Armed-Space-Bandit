@@ -198,3 +198,45 @@ Finished cleaning up the GameScene (probably cut out at least 100 lines of cruft
 
 27 October 2024:
 Doing a little more code clean up and removing old files.  Also need to remove any imports, otherwise it won't compile.
+
+6 November 2024:
+Moved out pretty much all of the extra/unused files (especially audio and images) and now the game is down to a much more manageable 1.8 MB in size.  It looks like that WAV files get transformed into some other type, perhaps something smaller than a typical WAV?  Is it smaller than an MP3?  If so, any MP3 might be better as a WAV then compiled down.
+
+12 November 2024:
+Working more on the itch.io page.  Added the text for the page.  Created the (315x250) cover image.
+
+13 November 2024:
+Updated the project to now be version 1.0.0 (removed the beta status).
+
+17 November 2024:
+Released the game!  Initial announcement on social networks (including the thing which used to be Twitter).  Interesting side note, I had a lot more attention on Mastodon than on ex-Twitter.  Showed off the game on the Sunday Brunch, was able to load it up in the Windows PD Simulator.
+
+18 November 2024:
+More updates on the itch.io page and announcing my game on Facebook.  This is going to be a gradual rollout for the announcement.  Side loaded the game and downloaded it to ensure that works properly.  Also loaded it up in the Mac PD Simulator.
+
+Latter half of November 2024:
+Slowly rolling out contacting others about the release of OASB.  Reaching out to individuals, YouTubers, social media, Discord, etc.  Did a little pretty much each day to spread the word.
+
+28 November 2024:
+Answered the interview questions for Xania for Uncrank'd.
+
+January-February 2025:
+Made some bug fixes for version 1.0.1.  Fixed the flickering and improper image location in the Credits screen.
+
+7 May 2026:
+After reading about the RUBDUBDUB cheat code in the 10th issue of Uncrank'd, I'm once again trying to implement the Tanuk_CodeSequence into this game again.  I found some documentation on how to implement the code in Pulp, but that doesn't help here.  Looking at Rae's source code for Rowbot Rally and Hexa are helping to give me tips on how to implement this in Lua.
+
+25 May 2026:
+Implementing the menu image when the game is paused.  Used my updated ordered_dithering script to create several dithered variants of the Pillars of Creation to use as the menu image.  The game seems to be locking up when playing a game, perhaps related to the Tanuk sequence code?  I'll have to experiment a little further to figure out what is going on.
+
+28 May 2026:
+Fixed an odd issue where the dark, dithered bar on the pause screen would sometimes be white when the Game screen was active.
+
+1 June 2026:
+Implemented the RUBDUBDUB cheat code functionality.  It appeared earlier attempts were causing issues, lock-ups, and crashes if more than one Tanuk cheat code was implemented. 
+
+3 June 2026:
+Clean up and small adjustments.  Added the heart icon on the title scene once the cheat mode is enabled.
+
+4 June 2026:
+Code clean up and moving old assets and files into the Old folder.
