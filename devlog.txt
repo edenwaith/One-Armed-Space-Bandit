@@ -234,3 +234,9 @@ Fixed an odd issue where the dark, dithered bar on the pause screen would someti
 
 1 June 2026:
 Implemented the RUBDUBDUB cheat code functionality.  It appeared earlier attempts were causing issues, lock-ups, and crashes if more than one Tanuk cheat code was implemented. 
+
+3 June 2026:
+Clean up and small adjustments.  Added the heart icon on the title scene once the cheat mode is enabled.
+
+4 June 2026:
+Code clean up and moving old assets and files into the Old folder.
